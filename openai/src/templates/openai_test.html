@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}OpenAI{% endblock %}
+
+{% block content %}
+<div class="container mx-auto my-8 p-4 md:p-6 bg-white rounded-lg shadow-md">
+    <div class="overflow-y-scroll h-96" id="scrollContainer">
+        <div id="answerContainer" class="p-2 md:p-4 bg-white rounded-lg">
+            <p id="answerContent" class="text-black flex gap-4 flex-col text-md capitalize"></p>
+        </div>
+        <div class="loading-container mt-2 md:mt-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+            id="loadingIndicator" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p class="loading-text text-sm md:text-lg mt-2">Loading...</p>
+        </div>
+    </div>
+    <form onsubmit="return getAnswer();" class="mt-4">
+        <div class="flex flex-col md:flex-row items-center">
+            <input type="text" class="form-input flex-grow p-2 md:p-3 rounded-tl-lg border-2 outline-none rounded-bl-lg"
+                placeholder="Enter query" id="questionTextarea">
+            <div class="input-group-append mt-2 md:mt-0">
+                <button
+                    class="bg-blue-600 border-2 hover:bg-blue-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg md:rounded-none"
+                    type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button class="bg-red-600 hover:bg-red-500 text-white px-3 md:px-4 py-2 md:py-3 rounded-lg mt-2 md:mt-0"
+                    type="button" onclick="resetConversation()">Reset</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    // Function to retrieve saved answer from localStorage
+    function getSavedAnswer() {
+        return localStorage.getItem("savedAnswer") || "";
+    }
+
+    // Function to save answer to localStorage
+    function saveAnswer(answer) {
+        localStorage.setItem("savedAnswer", answer);
+    }
+
+    // Function to display saved answer
+    function displaySavedAnswer() {
+        var savedAnswer = getSavedAnswer();
+        var answerContent = document.getElementById("answerContent");
+
+        if (savedAnswer) {
+            answerContent.innerHTML = savedAnswer;
+            answerContainer.style.display = "block";
+            scrollContainer.scrollTop = scrollContainer.scrollHeight; // Scroll to the bottom
+        }
+    }
+
+    // Call the function to display the saved answer on page load
+    displaySavedAnswer();
+
+    function getAnswer() {
+        var question = document.getElementById("questionTextarea").value;
+        var answerContainer = document.getElementById("answerContainer");
+        var answerContent = document.getElementById("answerContent");
+        var loadingIndicator = document.getElementById("loadingIndicator");
+        var loadingText = document.querySelector(".loading-text");
+
+        // Show loading indicator and text
+        loadingIndicator.style.display = "block";
+        loadingText.style.display = "block";
+        answerContainer.style.display = "none";
+
+        // Send the question to the Flask API using AJAX
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/ask_question", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                loadingIndicator.style.display = "none";
+                loadingText.style.display = "none";
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    var answer = response.answer;
+
+                    // Split the answer into points and add new lines
+                    var points = answer.split('\n');
+                    var pointsHTML = points.map(function (point) {
+                        return '<p>' + point + '</p>';
+                    }).join('');
+
+                    answerContent.innerHTML = pointsHTML;
+                    answerContainer.style.display = "block";
+                    // Save the answer to localStorage
+                    saveAnswer(answer);
+                    scrollContainer.scrollTop = scrollContainer.scrollHeight; // Scroll to the bottom
+                } else {
+                    answerContent.innerHTML = "An error occurred. Please try again.";
+                }
+                document.getElementById("questionTextarea").value = "";
+            }
+        };
+        xhr.send("question=" + encodeURIComponent(question));
+
+        return false; // Prevent form submission and page refresh
+    }
+
+    function resetConversation() {
+        var answerContainer = document.getElementById("answerContainer");
+        var answerContent = document.getElementById("answerContent");
+        var loadingIndicator = document.getElementById("loadingIndicator");
+        var loadingText = document.querySelector(".loading-text");
+
+        // Clear the answer and input field
+        answerContent.innerHTML = "";
+        document.getElementById("questionTextarea").value = "";
+
+        // Send a request to reset the conversation
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/resetConversation", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                // Reset successful
+            }
+        };
+        xhr.send();
+
+        // Hide answer container and loading text
+        answerContainer.style.display = "none";
+        loadingText.style.display = "none";
+
+        // Clear the saved answer from localStorage
+        localStorage.removeItem("savedAnswer");
+
+        return false; // Prevent form submission and page refresh
+    }
+</script>
+{% endblock %}
