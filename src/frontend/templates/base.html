@@ -1,3 +1,4 @@
+<!-- base.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,15 +6,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css" rel="stylesheet" />
-  <title>{% block title %}{% endblock %}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+  <title>{% block title %}{% endblock %}</title>
 </head>
 
 <body class="bg-gray-100 font-sans">
   <nav class="bg-blue-900 text-white">
     <div class="container flex justify-start items-center h-auto px-4 md:px-0 mx-auto md:py-6 py-4">
       <a class="text-white md:text-3xl font-sans text-xl w-full text-center font-bold" href="/"
-        style="text-decoration :none">Chat Bot</a>
+        style="text-decoration:none">Chat Bot</a>
     </div>
   </nav>
 
