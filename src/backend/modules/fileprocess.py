@@ -29,14 +29,16 @@ def fileprocess(file_path, user_id):
         return False
 
 
-def save_conversation(conversation, chat_id):
+def save_conversation(conversation, chat_id, chat_name=None):
     try:
-        insert_question_query = '''UPDATE pdfchat.chat_info
-SET conversation = %s where chat_id =%s
+        chat_query = ', chat_name = %s' if chat_name else ""
+        update_chat_query = f'''UPDATE pdfchat.chat_info
+SET conversation = %s{chat_query} where chat_id =%s
         '''
+
         # Pass parameters as a tuple
-        runInsertQuery(insert_question_query,
-                       (json.dumps(conversation), chat_id))
+        runInsertQuery(update_chat_query,
+                       (json.dumps(conversation), chat_name, chat_id))
         return True
 
     except Exception as e:
@@ -90,6 +92,35 @@ def load_chat_data(chat_id):
             if chat_data[0][4] is not None:
                 res['conversation'] = json.loads(chat_data[0][4])
             print(res)
+            return True, res
+        else:
+            # If chat_id not found, return False and an error message
+            return False, {"error": "Chat not found"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("some exception occured", e)
+        return False, {"error": str(e)}
+
+
+def load_chat_list():
+    try:
+        # Query the database to retrieve chat data based on chat_id
+        select_query = f'SELECT chat_id, chat_name FROM chat_info'
+        # values = (chat_id,)
+        chat_data = runSelectQuery(select_query)
+        print(chat_data)
+        # Check if the chat_id exists in the database
+        if chat_data:
+            # Convert the messages column from string to list
+            res = []
+            for rec_tup in chat_data:
+                rec = {
+
+                }
+                rec['chat_id'] = rec_tup[0]
+                rec['chat_name'] = rec_tup[1]
+                res.append(rec_tup)
             return True, res
         else:
             # If chat_id not found, return False and an error message

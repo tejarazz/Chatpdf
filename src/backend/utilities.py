@@ -12,7 +12,7 @@ openai.api_key = os.environ.get("OPENAI_API")
 # Modules
 
 
-def getResponseFromMessages(messages, query):
+def getResponseFromMessages(messages):
 
     chat_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo", messages=messages)

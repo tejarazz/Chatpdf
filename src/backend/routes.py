@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify
-from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -61,7 +61,24 @@ def list_files():
 
 def list_all_chats():
     # Implement logic to list all chats
-    return jsonify({"chats": []})
+
+    try:
+        # Get the chat_id parameter from the query string
+        # chat_id = request.args.get('chat_id')
+
+        success, chat_data = load_chat_list()
+
+        # Check if chat_data retrieval was successful
+        if success:
+            # Return the chat data as JSON
+            return jsonify(chat_data)
+        else:
+            # If chat_id not found or other errors, return an error response
+            return jsonify({"error": chat_data["error"]}), 404 if "Chat not found" in chat_data["error"] else 500
+
+    except Exception as e:
+        # Handle other potential errors
+        return jsonify({"error": str(e)}), 500
 
 
 def create_chat():
@@ -136,17 +153,46 @@ def ask_question(chat_id):
             "content": question_text
         }
         messages.append(q)
-        response = getResponseFromMessages(messages, question_text)
+        response = getResponseFromMessages(messages)
 
         a = {
             "content": response,
             "role": "assistant"
         }
         messages.append(a)
-        save_conversation(messages, chat_id)
         part_conv = []
         part_conv.append(q)
         part_conv.append(a)
+        chat_name = data["chat_name"]
+        if len(messages) <= 2:
+            messages_dum = []
+
+            # Multi-Shot Prompting
+            q = {
+                "role": "user",
+                "content": f'''Summarize the text provided in triple backticks in maximum 3 words. This will be used to recall this text using the summary generated. Take a hint from examples.
+                
+                EXAMPLE 1:
+                TEXT: Who is president of USA? I'm sorry, but I don't have real-time information. As of my last knowledge update in January 2022, Joe Biden was the President of the United States. Please verify with up-to-date sources to find the current President as my information might be outdated.
+                SUMMARY: Biden is US President.
+                
+                EXAMPLE 2:
+                TEXT: Suggest good books to read in myth? Certainly! Mythology is a rich and fascinating genre with a wide range of cultural and historical stories. Here are some excellent books in the realm of mythology:
+"The Hero with a Thousand Faces" by Joseph Campbell
+A classic exploration of the hero's journey and common mythological themes across cultures.
+"Norse Mythology" by Neil Gaiman
+Gaiman retells the classic Norse myths in his unique and engaging style.
+"Bulfinch's Mythology" by Thomas Bulfinch
+A compilation of Greek, Roman, and Norse mythology, providing a comprehensive overview.
+                SUMMARY:Mythology Book Recommendations
+                
+                Text:`{question_text}? {response}`
+                SUMMARY: '''
+            }
+
+            messages_dum.append(q)
+            chat_name = getResponseFromMessages(messages_dum)
+        save_conversation(messages, chat_id, chat_name)
         return jsonify({"conversation": part_conv})
 
     except Exception as e:

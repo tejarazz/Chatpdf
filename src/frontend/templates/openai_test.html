@@ -1,21 +1,20 @@
-{% extends 'base.html' %}
-
-{% block title %}
-ChatBot
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %} ChatBot {% endblock %} {% block
+content %}
 <!-- Main Section -->
 <div class="main-section flex flex-col md:flex-row h-full">
-
   <!-- Section 1: Categories -->
   <div class="section1 flex flex-col md:w-2/12 h-full pt-12">
-    <h6 id="chatTitle" class="flex justify-center m-4 p-2 font-bold bg-blue-900 text-white rounded-md">
+    <h6
+      id="chatTitle"
+      class="flex justify-center m-4 p-2 font-bold bg-blue-900 text-white rounded-md"
+    >
       Chat Title
     </h6>
     <!-- Category List -->
-    <div class="items flex flex-col justify-around pl-4 h-96 m-4 p-2 bg-blue-900 text-white rounded-md">
-      <h6>Entrophy</h6>
+    <div
+      class="items flex flex-col justify-around pl-4 h-96 m-4 p-2 bg-blue-900 text-white rounded-md"
+    >
+      <button onclick="">Entrophy</button>
       <h6>Data Science</h6>
       <h6>Maths</h6>
       <h6>Personal Chat</h6>
@@ -24,16 +23,27 @@ ChatBot
   </div>
 
   <!-- Section 2: Chat Area -->
-  <div class="section-2 w-full md:w-8/12 h-3/4 mt-14 mx-2 p-6 bg-white rounded-lg shadow-lg">
+  <div
+    class="section-2 w-full md:w-8/12 h-3/4 mt-14 mx-2 p-6 bg-white rounded-lg shadow-lg"
+  >
     <div class="overflow-y-scroll h-96" id="scrollContainer">
       <!-- Answer Container -->
-      <div id="answerContainer" class="p-4 bg-white rounded-lg md:w-3/5 lg:w-3/5">
-        <p id="answerContent" class="text-black font-sans gap-4 flex flex-col text-md capitalize"></p>
+      <div
+        id="answerContainer"
+        class="p-4 bg-white rounded-lg md:w-3/5 lg:w-3/5"
+      >
+        <p
+          id="answerContent"
+          class="text-black font-sans gap-4 flex flex-col text-md capitalize"
+        ></p>
       </div>
 
       <!-- Loading Indicator -->
-      <div class="loading-container mt-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-        id="loadingIndicator" style="display: none">
+      <div
+        class="loading-container mt-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        id="loadingIndicator"
+        style="display: none"
+      >
         <div class="spinner-border text-primary" role="status">
           <span class="sr-only">Generating..</span>
         </div>
@@ -47,17 +57,26 @@ ChatBot
     <form onsubmit="return getAnswer()" class="mt-4">
       <!-- Input and Buttons -->
       <div class="flex flex-col md:flex-row items-center">
-        <input type="text"
+        <input
+          type="text"
           class="form-input flex-grow p-3 md:p-3 w-full md:w-auto font-semibold border-b rounded-tl-lg border-t border-l outline-none rounded-bl-lg"
-          placeholder="Ask a Question" id="questionTextarea" name="question" />
+          placeholder="Ask a Question"
+          id="questionTextarea"
+          name="question"
+        />
         <div class="input-group-append mt-2 md:mt-0 space-x-2">
           <button
             class="bg-blue-900 border-2 hover:bg-blue-700 text-white px-6 md:px-6 py-3 rounded-lg md:rounded-tl md:rounded-bl"
-            type="button" onclick="getAnswer()">
+            type="button"
+            onclick="getAnswer()"
+          >
             <i class="fa-solid fa-arrow-right"></i>
           </button>
-          <button class="bg-red-600 hover:bg-red-500 text-white font-sans px-6 md:px-4 py-3 rounded-md mt-2 md:mt-0"
-            type="button" onclick="resetConversation()">
+          <button
+            class="bg-red-600 hover:bg-red-500 text-white font-sans px-6 md:px-4 py-3 rounded-md mt-2 md:mt-0"
+            type="button"
+            onclick="resetConversation()"
+          >
             Reset
           </button>
         </div>
@@ -68,7 +87,9 @@ ChatBot
   <!-- Section 3: File and Chat List -->
   <div class="section3 flex flex-col md:w-2/12 pt-12 h-full">
     <!-- Chat List -->
-    <div class="flex flex-col m-4 h-40 border border-black text-white rounded-md bg-blue-900">
+    <div
+      class="flex flex-col m-4 h-40 border border-black text-white rounded-md bg-blue-900"
+    >
       <h6 class="flex font-bold justify-center">Chat with</h6>
       <div id="pdfList" class="sitems flex flex-col py-2 justify-center">
         <!-- PDF names will be dynamically added here -->
@@ -77,39 +98,72 @@ ChatBot
 
     <!-- File Upload Form -->
     <form id="uploadForm" enctype="multipart/form-data">
-      <label for="fileInput"
-        class="relative flex items-center justify-center text-white font-bold px-20 py-2 rounded-md m-4 hover:bg-blue-700 bg-blue-900 cursor-pointer">
+      <label
+        for="fileInput"
+        class="relative flex items-center justify-center text-white font-bold px-20 py-2 rounded-md m-4 hover:bg-blue-700 bg-blue-900 cursor-pointer"
+      >
         <span id="uploadText">Upload</span>
-        <span id="uploadSpinner" class="absolute inset-0 flex items-center justify-center opacity-0">
+        <span
+          id="uploadSpinner"
+          class="absolute inset-0 flex items-center justify-center opacity-0"
+        >
           <!-- Tailwind CSS spinner -->
-          <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-r-2 border-b-2 border-blue-500"></div>
+          <div
+            class="animate-spin rounded-full h-5 w-5 border-t-2 border-r-2 border-b-2 border-blue-500"
+          ></div>
         </span>
       </label>
-      <input type="file" id="fileInput" name="file" accept=".pdf" style="display: none" onchange="LoadingFile()" />
+      <input
+        type="file"
+        id="fileInput"
+        name="file"
+        accept=".pdf"
+        style="display: none"
+        onchange="LoadingFile()"
+      />
     </form>
     <!-- File List Display -->
     <div id="pdfList"></div>
 
     <!-- Modal for File Selection -->
-    <div id="myModal" class="fixed inset-0 z-50 overflow-auto hidden bg-black bg-opacity-50">
+    <div
+      id="myModal"
+      class="fixed inset-0 z-50 overflow-auto hidden bg-black bg-opacity-50"
+    >
       <!-- Modal Content -->
       <div class="modal-dialog flex items-center justify-center min-h-screen">
-        <div class="modal-content bg-white w-3/6 mx-auto p-6 rounded-lg shadow-lg">
+        <div
+          class="modal-content bg-white w-3/6 mx-auto p-6 rounded-lg shadow-lg"
+        >
           <!-- Modal Header -->
-          <div class="modal-header border-b pb-4 flex justify-between items-center">
+          <div
+            class="modal-header border-b pb-4 flex justify-between items-center"
+          >
             <h4 class="modal-title text-xl font-semibold">Choose a File</h4>
-            <button type="button" class="btn-close text-4xl" onclick="toggleModal()">&times;</button>
+            <button
+              type="button"
+              class="btn-close text-4xl"
+              onclick="toggleModal()"
+            >
+              &times;
+            </button>
           </div>
 
           <!-- Modal body -->
           <div class="modal-body py-4">
             <!-- Search box with clickable search button -->
             <div class="mb-4 flex items-center">
-              <input type="text" id="searchInput" class="form-input p-3 border outline-none flex-grow "
-                placeholder="Enter File Name">
+              <input
+                type="text"
+                id="searchInput"
+                class="form-input p-3 border outline-none flex-grow"
+                placeholder="Enter File Name"
+              />
               <button
-                class="btn btn-primary p-3 hover:bg-blue-700 bg-blue-900 rounded-tr-lg rounded-br-lg  focus:outline-none focus:shadow-outline-blue"
-                type="button" id="searchButton">
+                class="btn btn-primary p-3 hover:bg-blue-700 bg-blue-900 rounded-tr-lg rounded-br-lg focus:outline-none focus:shadow-outline-blue"
+                type="button"
+                id="searchButton"
+              >
                 <i class="fas fa-search text-white"></i>
               </button>
             </div>
@@ -121,16 +175,31 @@ ChatBot
           </div>
 
           <!-- Modal Container -->
-          <div id="fileAlert"
-            class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-gray-800 bg-opacity-50 hidden">
+          <div
+            id="fileAlert"
+            class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-gray-800 bg-opacity-50 hidden"
+          >
             <!-- Modal Content -->
             <div class="bg-white p-8 rounded-md shadow-md relative">
               <p class="text-lg font-semibold mb-4">File Alert</p>
               <div id="fileAlertMessage"></div>
-              <button class="text-black px-4 py-2 rounded-md absolute top-0 right-0 mt-4" onclick="closeFileAlert()">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              <button
+                class="text-black px-4 py-2 rounded-md absolute top-0 right-0 mt-4"
+                onclick="closeFileAlert()"
+              >
+                <svg
+                  class="h-6 w-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
                 </svg>
               </button>
             </div>
@@ -139,51 +208,60 @@ ChatBot
           <!-- Modal footer -->
           <div class="modal-footer py-4 border-t flex justify-end">
             <!-- Add two buttons at the bottom right corners -->
-            <button type="button"
+            <button
+              type="button"
               class="bg-blue-900 border-2 hover:bg-blue-700 text-white font-medium px-6 mr-2 md:px-4 py-3 rounded-lg"
-              onclick="createChat('checked_file_path', 'existing_chat')">Existing Chat</button>
-            <button type="button"
+              onclick="createChat('checked_file_path', 'existing_chat')"
+            >
+              Existing Chat
+            </button>
+            <button
+              type="button"
               class="bg-blue-900 border-2 hover:bg-blue-700 text-white font-medium px-6 md:px-4 py-3 rounded-lg"
-              onclick="createChat('fileInput', 'new_chat')">New Chat</button>
+              onclick="createChat('fileInput', 'new_chat')"
+            >
+              New Chat
+            </button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Browse and Select Button -->
-    <button class="text-white font-bold px-6 mt-6 py-2 m-4 rounded-md hover:bg-blue-700 bg-blue-900"
-      onclick="toggleModal()">Browse and Select</button>
+    <button
+      class="text-white font-bold px-6 mt-6 py-2 m-4 rounded-md hover:bg-blue-700 bg-blue-900"
+      onclick="toggleModal()"
+    >
+      Browse and Select
+    </button>
   </div>
 </div>
 
-
-
 <script>
-
   // Prevent text selection on double-click for the entire webpage
-  document.addEventListener('selectstart', function (e) {
+  document.addEventListener("selectstart", function (e) {
     if (e.detail > 1) {
       e.preventDefault();
     }
   });
   // Ensure the DOM is fully loaded before executing the code
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener("DOMContentLoaded", function () {
     // Attach event listener to file input for changes
 
     // Get the current URL
     var url = new URL(window.location.href);
 
-
-
-    document.getElementById("fileInput").addEventListener("change", updatePdfList);
+    document
+      .getElementById("fileInput")
+      .addEventListener("change", updatePdfList);
     // Fetch the initial file list after the DOM is ready
     fetchFileList();
   });
 
   // Function to toggle the visibility of the modal
   function toggleModal() {
-    const modal = document.getElementById('myModal');
-    modal.classList.toggle('hidden');
+    const modal = document.getElementById("myModal");
+    modal.classList.toggle("hidden");
   }
 
   // Function to toggle the checkbox state
@@ -194,12 +272,12 @@ ChatBot
 
   // Function to handle the file upload loading animation
   function LoadingFile() {
-    document.getElementById('uploadText').style.opacity = '0';
-    document.getElementById('uploadSpinner').style.opacity = '1';
+    document.getElementById("uploadText").style.opacity = "0";
+    document.getElementById("uploadSpinner").style.opacity = "1";
 
     setTimeout(function () {
-      document.getElementById('uploadText').style.opacity = '1';
-      document.getElementById('uploadSpinner').style.opacity = '0';
+      document.getElementById("uploadText").style.opacity = "1";
+      document.getElementById("uploadSpinner").style.opacity = "0";
     }, 3000);
   }
 
@@ -237,30 +315,32 @@ ChatBot
     var chatTitle = document.getElementById("chatTitle");
     //answerContainer.style.display = "none";
     const urlParams = new URLSearchParams(window.location.search);
-    const chatId = urlParams.get('chat_id');
+    const chatId = urlParams.get("chat_id");
     console.log(chatId);
 
     // Create a fetch request to send the question to the server
     fetch(`http://127.0.0.1:5000/ask-question/${chatId}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: "question=" + encodeURIComponent(question)
+      body: "question=" + encodeURIComponent(question),
     })
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
       })
-      .then(response => {
+      .then((response) => {
         var partconv = response.conversation;
 
         console.log(partconv);
-        var conversationHTML = partconv.map(point => {
-          return `<p>${point.role}: ${point.content}</p>`;
-        }).join("");
+        var conversationHTML = partconv
+          .map((point) => {
+            return `<p>${point.role}: ${point.content}</p>`;
+          })
+          .join("");
         answerContent.innerHTML += conversationHTML;
         answerContainer.style.display = "block";
 
@@ -270,9 +350,9 @@ ChatBot
         saveAnswer(partconv);
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       })
-      .catch(error => {
+      .catch((error) => {
         answerContent.innerHTML = "An error occurred. Please try again.";
-        console.error('Error:', error);
+        console.error("Error:", error);
       });
 
     document.getElementById("questionTextarea").value = "";
@@ -295,15 +375,15 @@ ChatBot
     fetch("/resetConversation", {
       method: "GET",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      }
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
     })
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
           // Reset successful
         }
       })
-      .catch(error => console.error('Error resetting conversation:', error));
+      .catch((error) => console.error("Error resetting conversation:", error));
 
     answerContainer.style.display = "none";
     loadingText.style.display = "none";
@@ -324,15 +404,15 @@ ChatBot
         const formData = new FormData();
 
         for (let i = 0; i < fileInput.files.length; i++) {
-          formData.append('file', fileInput.files[i]);
+          formData.append("file", fileInput.files[i]);
         }
 
-        uploadSpinner.style.opacity = '1';
+        uploadSpinner.style.opacity = "1";
 
         // Use fetch API to upload files to the server
-        const response = await fetch('http://127.0.0.1:5000/file-upload', {
-          method: 'POST',
-          body: formData
+        const response = await fetch("http://127.0.0.1:5000/file-upload", {
+          method: "POST",
+          body: formData,
         });
 
         if (!response.ok) {
@@ -343,19 +423,19 @@ ChatBot
         await fetchFileList();
 
         // Reset spinner and file input
-        uploadSpinner.style.opacity = '0';
+        uploadSpinner.style.opacity = "0";
         fileInput.value = null;
       }
     } catch (error) {
-      console.error('Error updating PDF list:', error);
+      console.error("Error updating PDF list:", error);
     }
   }
 
   // Function to asynchronously fetch the list of files from the server
   async function fetchFileList() {
     try {
-      const response = await fetch('http://127.0.0.1:5000/list-files', {
-        method: 'GET',
+      const response = await fetch("http://127.0.0.1:5000/list-files", {
+        method: "GET",
       });
 
       if (!response.ok) {
@@ -363,42 +443,41 @@ ChatBot
       }
 
       const data = await response.json();
-      console.log('Fetched data:', data); // Log the fetched data
+      console.log("Fetched data:", data); // Log the fetched data
       generateFileItems(data.files);
     } catch (error) {
-      console.error('Error fetching file list:', error);
+      console.error("Error fetching file list:", error);
     }
   }
 
-
   function generateFileItems(fileList) {
-    const fileContainer = document.getElementById('fileList');
+    const fileContainer = document.getElementById("fileList");
 
     // Clear existing file items
-    fileContainer.innerHTML = '';
+    fileContainer.innerHTML = "";
 
     fileList.forEach(({ id, file_name: fileName }) => {
-      const fileItem = document.createElement('div');
+      const fileItem = document.createElement("div");
       fileItem.classList.add(
-        'mb-3',
-        'border',
-        'p-3',
-        'file-item',
-        'flex',
-        'items-center',
-        'hover:bg-gray-200',
-        'select-none'
+        "mb-3",
+        "border",
+        "p-3",
+        "file-item",
+        "flex",
+        "items-center",
+        "hover:bg-gray-200",
+        "select-none"
       );
 
-      const checkbox = document.createElement('input');
-      checkbox.classList.add('form-check-input', 'mr-3', 'file-checkbox');
-      checkbox.type = 'checkbox';
+      const checkbox = document.createElement("input");
+      checkbox.classList.add("form-check-input", "mr-3", "file-checkbox");
+      checkbox.type = "checkbox";
       checkbox.value = id;
       checkbox.id = `checkbox_${id}`;
       checkbox.checked = false;
 
-      const label = document.createElement('label');
-      label.classList.add('form-check-label');
+      const label = document.createElement("label");
+      label.classList.add("form-check-label");
       label.htmlFor = `checkbox_${id}`;
       label.textContent = fileName;
 
@@ -407,13 +486,13 @@ ChatBot
       fileItem.appendChild(label);
 
       // Click event on the file item to toggle the checkbox
-      fileItem.addEventListener('click', () => {
+      fileItem.addEventListener("click", () => {
         // Toggle the checkbox state
         checkbox.checked = !checkbox.checked;
 
         // Uncheck other checkboxes if the current one is checked
         if (checkbox.checked) {
-          const checkboxes = document.querySelectorAll('.file-checkbox');
+          const checkboxes = document.querySelectorAll(".file-checkbox");
           checkboxes.forEach((otherCheckbox) => {
             if (otherCheckbox !== checkbox) {
               otherCheckbox.checked = false;
@@ -429,22 +508,30 @@ ChatBot
 
   // Function to update PDF list with chat data
   function updatePdfListWithChatData(data) {
-    const pdfListElement = document.getElementById('pdfList');
+    const pdfListElement = document.getElementById("pdfList");
 
     if (pdfListElement) {
       // Update the PDF list based on chat data
-      pdfListElement.innerHTML = '';
+      pdfListElement.innerHTML = "";
 
       // Parse the documents JSON array from the chat data
       const documents = data.documents;
 
-      documents.forEach(documentName => {
+      documents.forEach((documentName) => {
         // Create a container div for the label
-        const container = document.createElement('div');
-        container.classList.add('text-sm', 'text-black', 'font-bold', 'bg-gray-200', 'rounded-sm', 'p-2', 'mx-2');
+        const container = document.createElement("div");
+        container.classList.add(
+          "text-sm",
+          "text-black",
+          "font-bold",
+          "bg-gray-200",
+          "rounded-sm",
+          "p-2",
+          "mx-2"
+        );
 
         // Create the label element
-        const label = document.createElement('label');
+        const label = document.createElement("label");
         label.textContent = documentName;
 
         // Append the label to the container
@@ -454,12 +541,10 @@ ChatBot
         pdfListElement.appendChild(container);
 
         // Add a line break after each container
-        pdfListElement.appendChild(document.createElement('br'));
+        pdfListElement.appendChild(document.createElement("br"));
       });
     }
   }
-
-
 
   function updateconversation(data) {
     var chatTitle = document.getElementById("chatTitle");
@@ -480,9 +565,11 @@ ChatBot
     } else {
       chatTitle.innerHTML = data.conversation[0].content;
       // Update conversation in the UI
-      var conversationHTML = data.conversation.map(point => {
-        return `<p>${point.role}: ${point.content}</p>`;
-      }).join("");
+      var conversationHTML = data.conversation
+        .map((point) => {
+          return `<p>${point.role}: ${point.content}</p>`;
+        })
+        .join("");
       answerContent.innerHTML = conversationHTML;
       answerContainer.style.display = "block";
     }
@@ -492,11 +579,10 @@ ChatBot
   function loadChat() {
     // Get the chat_id from the URL
     const urlParams = new URLSearchParams(window.location.search);
-    const chatId = urlParams.get('chat_id');
+    const chatId = urlParams.get("chat_id");
 
     // Check if there is no chatId in the URL
     if (!chatId) {
-
       // Clear the answerContent container
       var answerContent = document.getElementById("answerContent");
       answerContent.innerHTML = "";
@@ -506,16 +592,16 @@ ChatBot
 
     // Make a GET request to the server to fetch chat data and PDF list based on chat_id
     fetch(`http://127.0.0.1:5000/load-chat/${chatId}`)
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
           return response.json();
         } else {
-          throw new Error('Failed to fetch chat data from the server');
+          throw new Error("Failed to fetch chat data from the server");
         }
       })
-      .then(data => {
+      .then((data) => {
         // Handle the response data and update the webpage with chat information
-        console.log('Chat data:', data);
+        console.log("Chat data:", data);
 
         // Update your webpage with the fetched chat data
         // For example, you can display the chat name, documents, conversation, etc.
@@ -524,8 +610,8 @@ ChatBot
         updatePdfListWithChatData(data);
         updateconversation(data);
       })
-      .catch(error => {
-        console.error('Error:', error.message);
+      .catch((error) => {
+        console.error("Error:", error.message);
       });
   }
 
@@ -538,10 +624,12 @@ ChatBot
   // Function to create a chat
   function createChat() {
     // Get all checkboxes
-    const checkboxes = document.querySelectorAll('.file-checkbox');
+    const checkboxes = document.querySelectorAll(".file-checkbox");
 
     // Filter selected checkboxes
-    const selectedCheckboxes = Array.from(checkboxes).filter((checkbox) => checkbox.checked);
+    const selectedCheckboxes = Array.from(checkboxes).filter(
+      (checkbox) => checkbox.checked
+    );
 
     // Get the names of selected files
     const selectedFileNames = selectedCheckboxes.map((checkbox) => {
@@ -562,7 +650,7 @@ ChatBot
         checkbox.checked = false;
       });
     } else {
-      console.log('Please select a file before creating a chat.');
+      console.log("Please select a file before creating a chat.");
       // Optionally, you can provide feedback to the user in the UI
       // ...
     }
@@ -577,27 +665,27 @@ ChatBot
     };
 
     // Make a POST request to the server
-    fetch('http://127.0.0.1:5000/create-chat', {
-      method: 'POST',
+    fetch("http://127.0.0.1:5000/create-chat", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         // Add any other headers if needed
       },
       body: JSON.stringify(requestData),
     })
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
           // Handle a successful response from the server
           // You can perform additional actions here if needed
           return response.json();
         } else {
-          throw new Error('Failed to send request to the server');
+          throw new Error("Failed to send request to the server");
         }
       })
-      .then(data => {
+      .then((data) => {
         // Handle the response data from the server
         // You can perform additional actions here if needed
-        console.log('Server response:', data);
+        console.log("Server response:", data);
 
         // Get the chat_id from the response
         const chat_id = data.chat_id;
@@ -608,25 +696,33 @@ ChatBot
         // After creating the chat, call loadChat to fetch updated chat data and update PDF list
         loadChat();
       })
-      .catch(error => {
+      .catch((error) => {
         // Handle errors that occurred during the fetch
-        console.error('Error:', error.message);
+        console.error("Error:", error.message);
       });
   }
 
   // Add event listener to search button
-  document.getElementById("searchButton").addEventListener("click", searchFiles);
+  document
+    .getElementById("searchButton")
+    .addEventListener("click", searchFiles);
 
   // Add event listener to search input for key press
-  document.getElementById("searchInput").addEventListener("input", searchFilesOnKeyPress);
+  document
+    .getElementById("searchInput")
+    .addEventListener("input", searchFilesOnKeyPress);
 
   // Function to search for files based on the input value
   function searchFiles() {
-    var searchInput = document.getElementById("searchInput").value.toLowerCase();
+    var searchInput = document
+      .getElementById("searchInput")
+      .value.toLowerCase();
     var fileItems = document.querySelectorAll(".file-item");
 
     fileItems.forEach(function (fileItem) {
-      var fileName = fileItem.querySelector(".form-check-label").textContent.toLowerCase();
+      var fileName = fileItem
+        .querySelector(".form-check-label")
+        .textContent.toLowerCase();
       if (fileName.includes(searchInput)) {
         fileItem.style.display = "flex"; // Show the matching file item
       } else {
@@ -650,9 +746,6 @@ ChatBot
       });
     }
   });
-
 </script>
-
-
 
 {% endblock %}
