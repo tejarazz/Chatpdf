@@ -1,0 +1,154 @@
+import os
+from flask import Flask, request, jsonify
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data
+from config import Config
+from werkzeug.utils import secure_filename
+from datetime import datetime
+from utilities import getResponseFromMessages
+import json
+
+
+def file_upload():
+    try:
+        UPLOAD_FOLDER = Config.UPLOAD_FOLDER
+        # Check if the POST request has a file part
+        if 'file' not in request.files:
+            return jsonify({"error": "No file part"}), 400
+
+        file = request.files['file']
+
+        # Check if the user does not select a file
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
+        # Ensure the specified directory exists
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+        # Save the file to the specified directory on the "D" drive
+        file_path = os.path.join(
+            UPLOAD_FOLDER, f"{secure_filename(file.filename)}")
+        file.save(file_path)
+
+        print(fileprocess(file_path, 1))
+
+        return jsonify({"message": "File uploaded successfully", "file_name": file.filename}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def list_files():
+    try:
+        UPLOAD_FOLDER = Config.UPLOAD_FOLDER
+        files = os.listdir(UPLOAD_FOLDER)
+        file_list = []
+
+        for file in files:
+            file_path = os.path.join(UPLOAD_FOLDER, file)
+            file_info = {
+                'file_name': file,
+                'file_path': file_path,
+                'file_size': os.path.getsize(file_path),
+                'last_modified': os.path.getmtime(file_path)
+            }
+            file_list.append(file_info)
+
+        return jsonify({"files": file_list}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def list_all_chats():
+    # Implement logic to list all chats
+    return jsonify({"chats": []})
+
+
+def create_chat():
+    try:
+        data = request.get_json()
+        file_names = data['fileNames']
+
+        # Assuming user_id is available, replace with the actual user_id
+        user_id = 1  # Replace with the actual user_id
+
+        # Store chat information and retrieve the chat_id
+        stored_chat_id = store_chat_info(file_names, user_id)
+
+        print(stored_chat_id)
+
+        # # Convert the stored_chat_id to an integer
+        # stored_chat_id = int(
+        #     stored_chat_id) if stored_chat_id is not None else None
+
+        # Return chat_id as a numeric value in the response along with a success message
+        return jsonify({'message': f'Chat created successfully with files: {", ".join(file_names)}', 'chat_id': stored_chat_id}), 200
+    except Exception as e:
+        return jsonify({'error': f'{str(e)}. Files: {", ".join(file_names)}', 'chat_id': None}), 400
+
+
+def add_document(chat_id):
+
+    return jsonify({"message": "Document added succesfully"})
+
+
+def remove_document(chat_id):
+    # Implement logic to remove a document from a chat
+    return jsonify({"message": "Document removed from chat"})
+
+
+def delete_chat(chat_id):
+    # Implement logic to delete a chat
+    return jsonify({"message": "Chat deleted successfully"})
+
+
+def load_chat(chat_id):
+    try:
+        # Get the chat_id parameter from the query string
+        # chat_id = request.args.get('chat_id')
+
+        success, chat_data = load_chat_data(chat_id)
+
+        # Check if chat_data retrieval was successful
+        if success:
+            # Return the chat data as JSON
+            return jsonify(chat_data)
+        else:
+            # If chat_id not found or other errors, return an error response
+            return jsonify({"error": chat_data["error"]}), 404 if "Chat not found" in chat_data["error"] else 500
+
+    except Exception as e:
+        # Handle other potential errors
+        return jsonify({"error": str(e)}), 500
+
+
+def ask_question(chat_id):
+    try:
+        question_text = request.form.get('question')
+        if not question_text:
+            return jsonify({"error": "Question parameter is missing"}), 400
+
+        user_id = 1
+        status, data = load_chat_data(chat_id)
+        messages = data['conversation']
+        q = {
+            "role": "user",
+            "content": question_text
+        }
+        messages.append(q)
+        response = getResponseFromMessages(messages, question_text)
+
+        a = {
+            "content": response,
+            "role": "assistant"
+        }
+        messages.append(a)
+        save_conversation(messages, chat_id)
+        part_conv = []
+        part_conv.append(q)
+        part_conv.append(a)
+        return jsonify({"conversation": part_conv})
+
+    except Exception as e:
+        print(f"Error in ask_question route: {str(e)}")
+        return jsonify({"error": "Internal Server Error"}), 500
