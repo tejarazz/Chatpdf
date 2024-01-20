@@ -31,18 +31,26 @@ def fileprocess(file_path, user_id):
 
 def save_conversation(conversation, chat_id, chat_name=None):
     try:
-        chat_query = ', chat_name = %s' if chat_name else ""
+        # Format the chat_query string using a ternary operator
+        chat_query = ", chat_name = %s" if chat_name else ""
+
+        # Correctly format the update_chat_query string
         update_chat_query = f'''UPDATE pdfchat.chat_info
-SET conversation = %s{chat_query} where chat_id =%s
+SET conversation = %s{chat_query} WHERE chat_id = %s
         '''
 
         # Pass parameters as a tuple
-        runInsertQuery(update_chat_query,
-                       (json.dumps(conversation), chat_name, chat_id))
+        if chat_name:
+            runInsertQuery(update_chat_query, (json.dumps(
+                conversation), chat_name, chat_id))
+        else:
+            runInsertQuery(update_chat_query,
+                           (json.dumps(conversation), chat_id))
+
         return True
 
     except Exception as e:
-        print("some error occured in save conversation", e)
+        print("Some error occurred in save conversation:", e)
         return False
 
 

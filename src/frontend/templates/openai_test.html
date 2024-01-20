@@ -4,46 +4,30 @@ content %}
 <div class="main-section flex flex-col md:flex-row h-full">
   <!-- Section 1: Categories -->
   <div class="section1 flex flex-col md:w-2/12 h-full pt-12">
-    <h6
-      id="chatTitle"
-      class="flex justify-center m-4 p-2 font-bold bg-blue-900 text-white rounded-md"
-    >
+    <h6 id="chatTitle" class="flex justify-center m-4 p-2 font-bold bg-blue-900 text-white rounded-md">
       Chat Title
     </h6>
     <!-- Category List -->
-    <div
-      class="items flex flex-col justify-around pl-4 h-96 m-4 p-2 bg-blue-900 text-white rounded-md"
-    >
-      <button onclick="">Entrophy</button>
-      <h6>Data Science</h6>
-      <h6>Maths</h6>
-      <h6>Personal Chat</h6>
-      <h6>Theory of Relativity</h6>
+    <div class="items flex flex-col justify-around items-center pl-4 h-96 m-4 p-2 bg-blue-900 text-white rounded-md">
+      <button class="text-center">Entrophy</button>
+      <button class="text-center">Data Science</button>
+      <button class="text-center">Maths</button>
+      <button class="text-center">Personal Chat</button>
+      <button class="text-center">Theory of Relativity</button>
     </div>
   </div>
 
   <!-- Section 2: Chat Area -->
-  <div
-    class="section-2 w-full md:w-8/12 h-3/4 mt-14 mx-2 p-6 bg-white rounded-lg shadow-lg"
-  >
+  <div class="section-2 w-full md:w-8/12 h-3/4 mt-14 mx-2 p-6 bg-white rounded-lg shadow-lg">
     <div class="overflow-y-scroll h-96" id="scrollContainer">
       <!-- Answer Container -->
-      <div
-        id="answerContainer"
-        class="p-4 bg-white rounded-lg md:w-3/5 lg:w-3/5"
-      >
-        <p
-          id="answerContent"
-          class="text-black font-sans gap-4 flex flex-col text-md capitalize"
-        ></p>
+      <div id="answerContainer" class="p-4 bg-white rounded-lg">
+        <p id="answerContent" class="text-black font-sans gap-4 flex flex-col text-md capitalize"></p>
       </div>
 
       <!-- Loading Indicator -->
-      <div
-        class="loading-container mt-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-        id="loadingIndicator"
-        style="display: none"
-      >
+      <div class="loading-container mt-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        id="loadingIndicator" style="display: none">
         <div class="spinner-border text-primary" role="status">
           <span class="sr-only">Generating..</span>
         </div>
@@ -57,27 +41,14 @@ content %}
     <form onsubmit="return getAnswer()" class="mt-4">
       <!-- Input and Buttons -->
       <div class="flex flex-col md:flex-row items-center">
-        <input
-          type="text"
+        <input type="text"
           class="form-input flex-grow p-3 md:p-3 w-full md:w-auto font-semibold border-b rounded-tl-lg border-t border-l outline-none rounded-bl-lg"
-          placeholder="Ask a Question"
-          id="questionTextarea"
-          name="question"
-        />
+          placeholder="Ask a Question" id="questionTextarea" name="question" />
         <div class="input-group-append mt-2 md:mt-0 space-x-2">
           <button
             class="bg-blue-900 border-2 hover:bg-blue-700 text-white px-6 md:px-6 py-3 rounded-lg md:rounded-tl md:rounded-bl"
-            type="button"
-            onclick="getAnswer()"
-          >
+            type="button" onclick="getAnswer()">
             <i class="fa-solid fa-arrow-right"></i>
-          </button>
-          <button
-            class="bg-red-600 hover:bg-red-500 text-white font-sans px-6 md:px-4 py-3 rounded-md mt-2 md:mt-0"
-            type="button"
-            onclick="resetConversation()"
-          >
-            Reset
           </button>
         </div>
       </div>
@@ -87,9 +58,7 @@ content %}
   <!-- Section 3: File and Chat List -->
   <div class="section3 flex flex-col md:w-2/12 pt-12 h-full">
     <!-- Chat List -->
-    <div
-      class="flex flex-col m-4 h-40 border border-black text-white rounded-md bg-blue-900"
-    >
+    <div class="flex flex-col m-4 h-40 border border-black text-white rounded-md bg-blue-900">
       <h6 class="flex font-bold justify-center">Chat with</h6>
       <div id="pdfList" class="sitems flex flex-col py-2 justify-center">
         <!-- PDF names will be dynamically added here -->
@@ -98,53 +67,28 @@ content %}
 
     <!-- File Upload Form -->
     <form id="uploadForm" enctype="multipart/form-data">
-      <label
-        for="fileInput"
-        class="relative flex items-center justify-center text-white font-bold px-20 py-2 rounded-md m-4 hover:bg-blue-700 bg-blue-900 cursor-pointer"
-      >
+      <label for="fileInput"
+        class="relative flex items-center justify-center text-white font-bold px-20 py-2 rounded-md m-4 hover:bg-blue-700 bg-blue-900 cursor-pointer">
         <span id="uploadText">Upload</span>
-        <span
-          id="uploadSpinner"
-          class="absolute inset-0 flex items-center justify-center opacity-0"
-        >
+        <span id="uploadSpinner" class="absolute inset-0 flex items-center justify-center opacity-0">
           <!-- Tailwind CSS spinner -->
-          <div
-            class="animate-spin rounded-full h-5 w-5 border-t-2 border-r-2 border-b-2 border-blue-500"
-          ></div>
+          <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-r-2 border-b-2 border-blue-500"></div>
         </span>
       </label>
-      <input
-        type="file"
-        id="fileInput"
-        name="file"
-        accept=".pdf"
-        style="display: none"
-        onchange="LoadingFile()"
-      />
+      <input type="file" id="fileInput" name="file" accept=".pdf" style="display: none" onchange="LoadingFile()" />
     </form>
     <!-- File List Display -->
     <div id="pdfList"></div>
 
     <!-- Modal for File Selection -->
-    <div
-      id="myModal"
-      class="fixed inset-0 z-50 overflow-auto hidden bg-black bg-opacity-50"
-    >
+    <div id="myModal" class="fixed inset-0 z-50 overflow-auto hidden bg-black bg-opacity-50">
       <!-- Modal Content -->
       <div class="modal-dialog flex items-center justify-center min-h-screen">
-        <div
-          class="modal-content bg-white w-3/6 mx-auto p-6 rounded-lg shadow-lg"
-        >
+        <div class="modal-content bg-white w-3/6 mx-auto p-6 rounded-lg shadow-lg">
           <!-- Modal Header -->
-          <div
-            class="modal-header border-b pb-4 flex justify-between items-center"
-          >
+          <div class="modal-header border-b pb-4 flex justify-between items-center">
             <h4 class="modal-title text-xl font-semibold">Choose a File</h4>
-            <button
-              type="button"
-              class="btn-close text-4xl"
-              onclick="toggleModal()"
-            >
+            <button type="button" class="btn-close text-4xl" onclick="toggleModal()">
               &times;
             </button>
           </div>
@@ -153,17 +97,11 @@ content %}
           <div class="modal-body py-4">
             <!-- Search box with clickable search button -->
             <div class="mb-4 flex items-center">
-              <input
-                type="text"
-                id="searchInput"
-                class="form-input p-3 border outline-none flex-grow"
-                placeholder="Enter File Name"
-              />
+              <input type="text" id="searchInput" class="form-input p-3 border outline-none flex-grow"
+                placeholder="Enter File Name" />
               <button
                 class="btn btn-primary p-3 hover:bg-blue-700 bg-blue-900 rounded-tr-lg rounded-br-lg focus:outline-none focus:shadow-outline-blue"
-                type="button"
-                id="searchButton"
-              >
+                type="button" id="searchButton">
                 <i class="fas fa-search text-white"></i>
               </button>
             </div>
@@ -175,31 +113,16 @@ content %}
           </div>
 
           <!-- Modal Container -->
-          <div
-            id="fileAlert"
-            class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-gray-800 bg-opacity-50 hidden"
-          >
+          <div id="fileAlert"
+            class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-gray-800 bg-opacity-50 hidden">
             <!-- Modal Content -->
             <div class="bg-white p-8 rounded-md shadow-md relative">
               <p class="text-lg font-semibold mb-4">File Alert</p>
               <div id="fileAlertMessage"></div>
-              <button
-                class="text-black px-4 py-2 rounded-md absolute top-0 right-0 mt-4"
-                onclick="closeFileAlert()"
-              >
-                <svg
-                  class="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
+              <button class="text-black px-4 py-2 rounded-md absolute top-0 right-0 mt-4" onclick="closeFileAlert()">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
             </div>
@@ -208,18 +131,14 @@ content %}
           <!-- Modal footer -->
           <div class="modal-footer py-4 border-t flex justify-end">
             <!-- Add two buttons at the bottom right corners -->
-            <button
-              type="button"
+            <button type="button"
               class="bg-blue-900 border-2 hover:bg-blue-700 text-white font-medium px-6 mr-2 md:px-4 py-3 rounded-lg"
-              onclick="createChat('checked_file_path', 'existing_chat')"
-            >
+              onclick="createChat('checked_file_path', 'existing_chat')">
               Existing Chat
             </button>
-            <button
-              type="button"
+            <button type="button"
               class="bg-blue-900 border-2 hover:bg-blue-700 text-white font-medium px-6 md:px-4 py-3 rounded-lg"
-              onclick="createChat('fileInput', 'new_chat')"
-            >
+              onclick="createChat('fileInput', 'new_chat')">
               New Chat
             </button>
           </div>
@@ -228,10 +147,8 @@ content %}
     </div>
 
     <!-- Browse and Select Button -->
-    <button
-      class="text-white font-bold px-6 mt-6 py-2 m-4 rounded-md hover:bg-blue-700 bg-blue-900"
-      onclick="toggleModal()"
-    >
+    <button class="text-white font-bold px-6 mt-6 py-2 m-4 rounded-md hover:bg-blue-700 bg-blue-900"
+      onclick="toggleModal()">
       Browse and Select
     </button>
   </div>
@@ -521,13 +438,15 @@ content %}
         // Create a container div for the label
         const container = document.createElement("div");
         container.classList.add(
-          "text-sm",
+          "text-xs",
           "text-black",
           "font-bold",
           "bg-gray-200",
           "rounded-sm",
           "p-2",
-          "mx-2"
+          "mx-2",
+          "overflow-hidden", // Add this class
+          "whitespace-nowrap" // Add this class
         );
 
         // Create the label element
@@ -558,12 +477,16 @@ content %}
 
     // Check if there is no conversation data
     if (data.conversation.length === 0) {
-      chatTitle.innerHTML = "Chat Title";
+      // If chat_name is available, use it; otherwise, set a default title
+      chatTitle.innerHTML = data.chat_name || "Chat Title";
+
       // Clear the answer content
       answerContent.innerHTML = "";
       answerContainer.style.display = "none";
     } else {
-      chatTitle.innerHTML = data.conversation[0].content;
+      // Update chat title with chat_name from the server
+      chatTitle.innerHTML = data.chat_name || "Chat Title";
+
       // Update conversation in the UI
       var conversationHTML = data.conversation
         .map((point) => {
@@ -574,6 +497,9 @@ content %}
       answerContainer.style.display = "block";
     }
   }
+
+
+
 
   // Function to load chat data and update PDF list
   function loadChat() {

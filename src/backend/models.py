@@ -37,19 +37,6 @@ def create_file_data_table():
     runsqlQuery(query)
 
 
-def create_questions_list_table():
-    query = '''
-    CREATE TABLE IF NOT EXISTS questions_list (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        question_text VARCHAR(255),
-        embeddings_json JSON,
-        user_id INT,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-    '''
-    runsqlQuery(query)
-
-
 def create_chat_info_table():
     query = '''
     CREATE TABLE IF NOT EXISTS Chat_info (
@@ -89,31 +76,6 @@ def get_chat_info(user_id):
         return None
 
 
-def get_question_list(user_id):
-    try:
-        query = '''
-        SELECT id, question_text, embeddings_json
-        FROM questions_list
-        WHERE user_id = %s
-        '''
-        result = runsqlQuery(query, (user_id,), fetch=True)
-
-        question_list = []
-        for row in result:
-            question_info = {
-                'id': row[0],
-                'question_text': row[1],
-                'embeddings_json': row[2]
-            }
-            question_list.append(question_info)
-
-        return question_list
-
-    except Exception as e:
-        print(f"Error in get_question_list: {e}")
-        return None
-
-
 def get_file_list():
     try:
         query = '''
@@ -143,7 +105,6 @@ def get_file_list():
 def create_tables():
     create_users_table()
     create_file_data_table()
-    create_questions_list_table()
     create_chat_info_table()
 
 
