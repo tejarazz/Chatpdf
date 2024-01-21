@@ -4,16 +4,13 @@ content %}
 <div class="main-section flex flex-col md:flex-row h-full">
   <!-- Section 1: Categories -->
   <div class="section1 flex flex-col md:w-2/12 h-full pt-12">
-    <h6 id="chatTitle" class="flex justify-center m-4 p-2 font-bold bg-blue-900 text-white rounded-md">
+    <h6 id="chatTitle"
+      class="flex justify-center m-4 p-2 font-medium text-sm bg-blue-900 text-white rounded-md h-12 overflow-hidden">
       Chat Title
     </h6>
-    <!-- Category List -->
-    <div class="items flex flex-col justify-around items-center pl-4 h-96 m-4 p-2 bg-blue-900 text-white rounded-md">
-      <button class="text-center">Entrophy</button>
-      <button class="text-center">Data Science</button>
-      <button class="text-center">Maths</button>
-      <button class="text-center">Personal Chat</button>
-      <button class="text-center">Theory of Relativity</button>
+    <div id="chatListSection"
+      class="items flex flex-col  justify-around items-center h-96 m-4 p-2 my-11 bg-blue-900 text-white rounded-md">
+      <!-- Content will be dynamically added here -->
     </div>
   </div>
 
@@ -21,20 +18,10 @@ content %}
   <div class="section-2 w-full md:w-8/12 h-3/4 mt-14 mx-2 p-6 bg-white rounded-lg shadow-lg">
     <div class="overflow-y-scroll h-96" id="scrollContainer">
       <!-- Answer Container -->
-      <div id="answerContainer" class="p-4 bg-white rounded-lg">
+      <div id="answerContainer" class="p-4 m-4 bg-white rounded-lg">
         <p id="answerContent" class="text-black font-sans gap-4 flex flex-col text-md capitalize"></p>
       </div>
 
-      <!-- Loading Indicator -->
-      <div class="loading-container mt-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-        id="loadingIndicator" style="display: none">
-        <div class="spinner-border text-primary" role="status">
-          <span class="sr-only">Generating..</span>
-        </div>
-        <p class="loading-text text-sm font-bold font-sans mt-2">
-          Generating..
-        </p>
-      </div>
     </div>
 
     <!-- User Input Form -->
@@ -43,16 +30,20 @@ content %}
       <div class="flex flex-col md:flex-row items-center">
         <input type="text"
           class="form-input flex-grow p-3 md:p-3 w-full md:w-auto font-semibold border-b rounded-tl-lg border-t border-l outline-none rounded-bl-lg"
-          placeholder="Ask a Question" id="questionTextarea" name="question" />
+          placeholder="Ask a Question" id="questionTextarea" name="question" oninput="toggleButton()">
         <div class="input-group-append mt-2 md:mt-0 space-x-2">
           <button
-            class="bg-blue-900 border-2 hover:bg-blue-700 text-white px-6 md:px-6 py-3 rounded-lg md:rounded-tl md:rounded-bl"
-            type="button" onclick="getAnswer()">
-            <i class="fa-solid fa-arrow-right"></i>
+            class="border-2 bg-gray-600 px-6 md:px-6 py-3 rounded-lg md:rounded-tl md:rounded-bl transition-colors relative"
+            type="button" onclick="getAnswer()" id="submitButton" disabled>
+            <i class="fas fa-arrow-up text-white" id="arrowIcon"></i>
+            <div class="absolute inset-0 flex items-center justify-center loading-spinner hidden" id="loadingSpinner">
+              <div class="rounded-full h-6 w-6 border-t-2 border-r-2 border-b-2 border-blue-500 animate-spin"></div>
+            </div>
           </button>
         </div>
       </div>
     </form>
+
   </div>
 
   <!-- Section 3: File and Chat List -->
@@ -60,7 +51,7 @@ content %}
     <!-- Chat List -->
     <div class="flex flex-col m-4 h-40 border border-black text-white rounded-md bg-blue-900">
       <h6 class="flex font-bold justify-center">Chat with</h6>
-      <div id="pdfList" class="sitems flex flex-col py-2 justify-center">
+      <div id="pdfList" class="sitems flex flex-col py-2">
         <!-- PDF names will be dynamically added here -->
       </div>
     </div>
@@ -181,21 +172,18 @@ content %}
     modal.classList.toggle("hidden");
   }
 
-  // Function to toggle the checkbox state
-  function toggleCheckbox(checkboxId) {
-    const checkbox = document.getElementById(checkboxId);
-    checkbox.checked = !checkbox.checked;
-  }
+  // Function to toggle button state and appearance
+  function toggleButton() {
+    var questionInput = document.getElementById("questionTextarea");
+    var submitButton = document.getElementById("submitButton");
+    var arrowIcon = document.getElementById("arrowIcon");
 
-  // Function to handle the file upload loading animation
-  function LoadingFile() {
-    document.getElementById("uploadText").style.opacity = "0";
-    document.getElementById("uploadSpinner").style.opacity = "1";
+    // Check if the input field has text
+    var hasText = questionInput.value.trim() !== "";
 
-    setTimeout(function () {
-      document.getElementById("uploadText").style.opacity = "1";
-      document.getElementById("uploadSpinner").style.opacity = "0";
-    }, 3000);
+    // Update button state and appearance
+    submitButton.disabled = !hasText;
+    submitButton.style.backgroundColor = hasText ? "darkblue" : "gray";
   }
 
   // Function to retrieve saved answer from local storage
@@ -223,25 +211,61 @@ content %}
   // Call the function to display the saved answer
   displaySavedAnswer();
 
-  // Function to get the answer from the server
-  function getAnswer() {
-    var question = document.getElementById("questionTextarea").value;
-    var answerContainer = document.getElementById("answerContainer");
-    var answerContent = document.getElementById("answerContent");
-    var loadingText = document.querySelector(".loading-text");
-    var chatTitle = document.getElementById("chatTitle");
-    //answerContainer.style.display = "none";
+  // Function to initialize the form
+  function initializeForm() {
+    // Get DOM elements
+    var submitButton = document.getElementById("submitButton");
     const urlParams = new URLSearchParams(window.location.search);
     const chatId = urlParams.get("chat_id");
-    console.log(chatId);
 
-    // Create a fetch request to send the question to the server
+    // Check if chat ID is present in the URL
+    if (!chatId) {
+      // Disable only the button if chat ID is not present
+      submitButton.disabled = true;
+    }
+  }
+
+  // Function to handle getting an answer
+  function getAnswer() {
+    // Get DOM elements
+    var questionInput = document.getElementById("questionTextarea");
+    var submitButton = document.getElementById("submitButton");
+    var arrowIcon = document.getElementById("arrowIcon");
+    var loadingSpinner = document.getElementById("loadingSpinner");
+    var answerContainer = document.getElementById("answerContainer");
+    var answerContent = document.getElementById("answerContent");
+    var scrollContainer = document.getElementById("scrollContainer"); // Assuming you have a scroll container
+    const urlParams = new URLSearchParams(window.location.search);
+    const chatId = urlParams.get("chat_id");
+
+    // Check if chat ID is present in the URL
+    if (!chatId) {
+      // Alert the user to add a PDF if chat ID is not present
+      alert("Please upload a PDF to ask a question.");
+      return false;
+    }
+
+    // Check if the input field has text
+    if (questionInput.value.trim() === "") {
+      // Disable the button and return if no text is inserted
+      submitButton.disabled = true;
+      return false;
+    }
+
+    // Disable the button after sending a question
+    submitButton.disabled = true;
+
+    // Show loading spinner and hide arrow icon
+    loadingSpinner.classList.remove("hidden");
+    arrowIcon.style.visibility = "hidden"; // hide the arrow icon
+
+    // Fetch data from the server
     fetch(`http://127.0.0.1:5000/ask-question/${chatId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: "question=" + encodeURIComponent(question),
+      body: "question=" + encodeURIComponent(questionInput.value),
     })
       .then((response) => {
         if (!response.ok) {
@@ -250,72 +274,82 @@ content %}
         return response.json();
       })
       .then((response) => {
+        console.log("Server Response:", response);
+
+        // Process the response and update the UI
         var partconv = response.conversation;
 
-        console.log(partconv);
-        var conversationHTML = partconv
-          .map((point) => {
-            return `<p>${point.role}: ${point.content}</p>`;
-          })
-          .join("");
-        answerContent.innerHTML += conversationHTML;
+        // Add the entire conversation to the answerContent
+        var conversationHTML = partconv.map((point) => {
+          return `<p><strong>${point.role}:</strong> ${point.content}</p>`;
+        }).join("");
+
+        // Check if the response includes any code block
+        if (response.codeBlock) {
+          // Add the code block to the answerContent with proper formatting
+          var codeBlockContainer = `<p><strong>Code Block:</strong></p><pre>${escapeHTML(response.codeBlock)}</pre>`;
+          answerContent.innerHTML += conversationHTML + codeBlockContainer;
+        } else {
+          // If no code block, display only the conversation
+          answerContent.innerHTML += conversationHTML;
+        }
+
         answerContainer.style.display = "block";
 
         // Trigger a reflow or repaint
         answerContainer.offsetHeight;
 
+        // Save the answer and scroll to the bottom of the container
+        // Assuming you have a function called saveAnswer
         saveAnswer(partconv);
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
+
+        // Enable the button after receiving the response
+        submitButton.disabled = false;
+
+        // Reset the button to show arrow icon and hide loading spinner
+        loadingSpinner.classList.add("hidden");
+        arrowIcon.style.visibility = "visible"; // show the arrow icon
+
+        // Reset the button color to gray
+        submitButton.style.backgroundColor = "gray";
       })
       .catch((error) => {
         answerContent.innerHTML = "An error occurred. Please try again.";
         console.error("Error:", error);
+
+        submitButton.disabled = false;
+
+        loadingSpinner.classList.add("hidden");
+        arrowIcon.style.visibility = "visible";
+
+        submitButton.style.backgroundColor = "gray";
       });
 
-    document.getElementById("questionTextarea").value = "";
-    return false;
-  }
-  // Function to reset the conversation
-  function resetConversation() {
-    var answerContainer = document.getElementById("answerContainer");
-    var answerContent = document.getElementById("answerContent");
-    var loadingIndicator = document.getElementById("loadingIndicator");
-    var loadingText = document.querySelector(".loading-text");
-    var chatTitle = document.getElementById("chatTitle");
-
-    chatTitle.innerHTML = "Chat Title";
-
-    answerContent.innerHTML = "";
-    document.getElementById("questionTextarea").value = "";
-
-    // Create a fetch request to reset the conversation on the server
-    fetch("/resetConversation", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          // Reset successful
-        }
-      })
-      .catch((error) => console.error("Error resetting conversation:", error));
-
-    answerContainer.style.display = "none";
-    loadingText.style.display = "none";
-
-    // Remove the saved answer from local storage
-    localStorage.removeItem("savedAnswer");
+    // Clear the input field
+    questionInput.value = "";
 
     return false;
   }
+
+  // Function to escape HTML characters
+  function escapeHTML(html) {
+    return html.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // Call initializeForm to set the initial state of the form
+  initializeForm();
+
 
   // Function to update the list of PDFs
   async function updatePdfList() {
     try {
       const fileInput = document.getElementById("fileInput");
       const uploadSpinner = document.getElementById("uploadSpinner");
+      const uploadText = document.getElementById("uploadText");
+
+      // Hide the upload text initially
+      uploadText.style.opacity = "0";
 
       if (fileInput && fileInput.files && fileInput.files.length > 0) {
         const formData = new FormData();
@@ -342,6 +376,9 @@ content %}
         // Reset spinner and file input
         uploadSpinner.style.opacity = "0";
         fileInput.value = null;
+
+        // Show the upload text after successful upload
+        uploadText.style.opacity = "1";
       }
     } catch (error) {
       console.error("Error updating PDF list:", error);
@@ -373,7 +410,7 @@ content %}
     // Clear existing file items
     fileContainer.innerHTML = "";
 
-    fileList.forEach(({ id, file_name: fileName }) => {
+    fileList.forEach(({ file_name: fileName, file_path, file_size, last_modified }) => {
       const fileItem = document.createElement("div");
       fileItem.classList.add(
         "mb-3",
@@ -389,38 +426,28 @@ content %}
       const checkbox = document.createElement("input");
       checkbox.classList.add("form-check-input", "mr-3", "file-checkbox");
       checkbox.type = "checkbox";
-      checkbox.value = id;
-      checkbox.id = `checkbox_${id}`;
+      checkbox.value = file_path; // Use file_path as the value for the checkbox
+      checkbox.id = `checkbox_${fileName}`;
       checkbox.checked = false;
 
       const label = document.createElement("label");
       label.classList.add("form-check-label");
-      label.htmlFor = `checkbox_${id}`;
+      label.htmlFor = `checkbox_${fileName}`;
       label.textContent = fileName;
+      label.style.width = "100%"; // Set the label width to 100%
 
       // Append the checkbox and label to the file item
       fileItem.appendChild(checkbox);
       fileItem.appendChild(label);
 
-      // Click event on the file item to toggle the checkbox
-      fileItem.addEventListener("click", () => {
-        // Toggle the checkbox state
-        checkbox.checked = !checkbox.checked;
-
-        // Uncheck other checkboxes if the current one is checked
-        if (checkbox.checked) {
-          const checkboxes = document.querySelectorAll(".file-checkbox");
-          checkboxes.forEach((otherCheckbox) => {
-            if (otherCheckbox !== checkbox) {
-              otherCheckbox.checked = false;
-            }
-          });
-        }
-      });
-
       // Append the file item to the file container
       fileContainer.appendChild(fileItem);
     });
+  }
+
+  // Function to remove trailing dot from a string
+  function removeTrailingDot(str) {
+    return str.endsWith('.') ? str.slice(0, -1) : str;
   }
 
   // Function to update PDF list with chat data
@@ -435,23 +462,27 @@ content %}
       const documents = data.documents;
 
       documents.forEach((documentName) => {
+        // Remove trailing dot from the documentName
+        const cleanedDocumentName = removeTrailingDot(documentName);
+
         // Create a container div for the label
         const container = document.createElement("div");
         container.classList.add(
           "text-xs",
           "text-black",
-          "font-bold",
+          "font-medium",
           "bg-gray-200",
           "rounded-sm",
           "p-2",
           "mx-2",
-          "overflow-hidden", // Add this class
-          "whitespace-nowrap" // Add this class
+          "overflow-hidden",
+          "whitespace-nowrap",
+          "text-center"
         );
 
         // Create the label element
         const label = document.createElement("label");
-        label.textContent = documentName;
+        label.textContent = cleanedDocumentName;
 
         // Append the label to the container
         container.appendChild(label);
@@ -469,23 +500,25 @@ content %}
     var chatTitle = document.getElementById("chatTitle");
     var answerContainer = document.getElementById("answerContainer");
     var answerContent = document.getElementById("answerContent");
-    var loadingIndicator = document.getElementById("loadingIndicator");
-    var loadingText = document.querySelector(".loading-text");
 
-    loadingIndicator.style.display = "none";
-    loadingText.style.display = "none";
+    // Function to remove trailing dot from a string
+    function removeTrailingDot(str) {
+      return str.endsWith('.') ? str.slice(0, -1) : str;
+    }
 
     // Check if there is no conversation data
     if (data.conversation.length === 0) {
       // If chat_name is available, use it; otherwise, set a default title
-      chatTitle.innerHTML = data.chat_name || "Chat Title";
+      chatTitle.innerHTML = removeTrailingDot(data.chat_name) || "Chat Title";
+      chatTitle.classList.add('text-sm'); // Set the size to medium
 
       // Clear the answer content
       answerContent.innerHTML = "";
       answerContainer.style.display = "none";
     } else {
       // Update chat title with chat_name from the server
-      chatTitle.innerHTML = data.chat_name || "Chat Title";
+      chatTitle.innerHTML = removeTrailingDot(data.chat_name) || "Chat Title";
+      chatTitle.classList.add('text-sm');
 
       // Update conversation in the UI
       var conversationHTML = data.conversation
@@ -497,9 +530,6 @@ content %}
       answerContainer.style.display = "block";
     }
   }
-
-
-
 
   // Function to load chat data and update PDF list
   function loadChat() {
@@ -660,7 +690,7 @@ content %}
   // Function to search for files on key press
   function searchFilesOnKeyPress() {
     // Use a delay to wait for the input to be updated
-    setTimeout(searchFiles, 300);
+    setTimeout(searchFiles, 200);
   }
 
   // Reset search when the search input is cleared
@@ -672,6 +702,88 @@ content %}
       });
     }
   });
+
+  async function get_chat_list() {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/list-all-chats');
+      const data = await response.json();
+
+      if (response.ok) {
+        displayChatList(data);
+      } else {
+        console.error('Failed to fetch chat list:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching chat list:', error);
+    }
+  }
+
+  function accessChat(chat_id) {
+    const chatUrl = `http://127.0.0.1:8080/?chat_id=${chat_id}`;
+    window.location.href = chatUrl;
+  }
+
+  function createButtonClickHandler(chat, chatContainer) {
+    return function () {
+      accessChat(chat.chat_id);
+    };
+  }
+
+  async function removeChat(chat_id, chatContainer) {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000//delete-chat/${chat_id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Failed to remove chat:', data);
+      }
+    } catch (error) {
+      console.error('Error removing chat:', error);
+    } finally {
+      // Remove the chat container from the UI
+      chatContainer.remove();
+    }
+  }
+
+  function displayChatList(chats) {
+    const chatListSection = document.getElementById('chatListSection');
+
+    // Reverse the chats array
+    const reversedChats = chats.slice().reverse();
+
+    // Exclude the first chat
+    const chatsToDisplay = reversedChats.slice(1);
+
+    chatsToDisplay.forEach(chat => {
+      const chatContainer = document.createElement('div');
+      chatContainer.classList.add('flex', 'flex-col', 'bg-gray-200', 'rounded', 'w-full', 'h-16', 'relative', 'shadow-md');
+
+      const chatNameWithoutDot = chat.chat_name.endsWith('.') ? chat.chat_name.slice(0, -1) : chat.chat_name;
+
+      const accessButton = document.createElement('button');
+      accessButton.textContent = chatNameWithoutDot;
+      accessButton.classList.add('bg-gray-200', 'text-black', 'text-xs', 'font-medium', 'rounded', 'text-xs', 'cursor-pointer', 'whitespace-normal', 'overflow-hidden', 'hover:bg-teal-600', 'focus:outline-none', 'w-full', 'h-16');
+      accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
+
+      const removeButton = document.createElement('button');
+      removeButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+      removeButton.classList.add('absolute', 'top-5', 'right-2', 'bg-red-500', 'text-white', 'rounded-full', 'px-2', 'py-1', 'text-xs', 'cursor-pointer', 'hover:bg-red-600', 'focus:outline-none');
+      removeButton.addEventListener('click', function (event) {
+        event.stopPropagation();
+        removeChat(chat.chat_id, chatContainer);
+      });
+
+      chatContainer.appendChild(accessButton);
+      chatContainer.appendChild(removeButton);
+
+      chatListSection.appendChild(chatContainer);
+    });
+  }
+
+  // Call the function to fetch and display the chat list
+  get_chat_list();
 </script>
 
 {% endblock %}

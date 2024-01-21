@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify
-from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list, del_chat
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -115,8 +115,19 @@ def remove_document(chat_id):
 
 
 def delete_chat(chat_id):
-    # Implement logic to delete a chat
-    return jsonify({"message": "Chat deleted successfully"})
+    try:
+        # Call the del_chat function to delete the chat
+        success, result = del_chat(chat_id)
+
+        if success:
+            return jsonify(result)
+        else:
+            return jsonify(result), 404
+
+    except Exception as e:
+        # Handle other potential errors and return an error message
+        print("An exception occurred:", e)
+        return jsonify({"error": str(e)}), 500
 
 
 def load_chat(chat_id):
@@ -167,31 +178,30 @@ def ask_question(chat_id):
         if len(messages) <= 2:
             messages_dum = []
 
-            # Multi-Shot Prompting
-            q = {
-                "role": "user",
-                "content": f'''Summarize the text provided in triple backticks in maximum 3 words. This will be used to recall this text using the summary generated. Take a hint from examples.
+        q = {
+            "role": "user",
+            "content": f'''Summarize the text provided in triple backticks in maximum 3 words. This will be used to recall this text using the summary generated. Take a hint from examples.
                 
                 EXAMPLE 1:
                 TEXT: Who is president of USA? I'm sorry, but I don't have real-time information. As of my last knowledge update in January 2022, Joe Biden was the President of the United States. Please verify with up-to-date sources to find the current President as my information might be outdated.
-                SUMMARY: Biden is US President.
+                SUMMARY: Biden is President.
                 
                 EXAMPLE 2:
                 TEXT: Suggest good books to read in myth? Certainly! Mythology is a rich and fascinating genre with a wide range of cultural and historical stories. Here are some excellent books in the realm of mythology:
-"The Hero with a Thousand Faces" by Joseph Campbell
-A classic exploration of the hero's journey and common mythological themes across cultures.
-"Norse Mythology" by Neil Gaiman
-Gaiman retells the classic Norse myths in his unique and engaging style.
-"Bulfinch's Mythology" by Thomas Bulfinch
-A compilation of Greek, Roman, and Norse mythology, providing a comprehensive overview.
-                SUMMARY:Mythology Book Recommendations
+                "The Hero with a Thousand Faces" by Joseph Campbell
+                A classic exploration of the hero's journey and common mythological themes across cultures.
+                "Norse Mythology" by Neil Gaiman
+                Gaiman retells the classic Norse myths in his unique and engaging style.
+                "Bulfinch's Mythology" by Thomas Bulfinch
+                A compilation of Greek, Roman, and Norse mythology, providing a comprehensive overview.
+                SUMMARY: Mythology Book Recommendations
                 
-                Text:`{question_text}? {response}`
+                Text:`{question_text}? {response}`. Response should not exceed three words.
                 SUMMARY: '''
-            }
+        }
 
-            messages_dum.append(q)
-            chat_name = getResponseFromMessages(messages_dum)
+        messages_dum.append(q)
+        chat_name = getResponseFromMessages(messages_dum)
         save_conversation(messages, chat_id, chat_name)
         return jsonify({"conversation": part_conv})
 

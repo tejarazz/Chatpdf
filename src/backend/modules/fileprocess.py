@@ -1,4 +1,4 @@
-from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQuery, runSelectQuery
+from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQuery, runSelectQuery, runDeleteQuery
 import os
 import json
 
@@ -128,7 +128,7 @@ def load_chat_list():
                 }
                 rec['chat_id'] = rec_tup[0]
                 rec['chat_name'] = rec_tup[1]
-                res.append(rec_tup)
+                res.append(rec)
             return True, res
         else:
             # If chat_id not found, return False and an error message
@@ -137,4 +137,32 @@ def load_chat_list():
     except Exception as e:
         # Handle other potential errors and return False and an error message
         print("some exception occured", e)
+        return False, {"error": str(e)}
+
+
+def del_chat(chat_id):
+    try:
+        values = (chat_id,)
+        # Delete the chat with the specified chat_id
+        delete_query = 'DELETE FROM chat_info WHERE chat_id = %s'
+        runDeleteQuery(delete_query, values)
+        return True, {"message": "Chat deleted successfully"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
+        return False, {"error": str(e)}
+
+
+def rem_doc(chat_id):
+    try:
+        values = (chat_id,)
+        # Delete the chat with the specified chat_id
+        delete_query = 'DELETE FROM chat_info WHERE documents = %s'
+        runDeleteQuery(delete_query, values)
+        return True, {"message": "Document removed successfully"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
         return False, {"error": str(e)}
