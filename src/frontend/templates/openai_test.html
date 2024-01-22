@@ -217,14 +217,7 @@ content %}
     var submitButton = document.getElementById("submitButton");
     const urlParams = new URLSearchParams(window.location.search);
     const chatId = urlParams.get("chat_id");
-
-    // Check if chat ID is present in the URL
-    if (!chatId) {
-      // Disable only the button if chat ID is not present
-      submitButton.disabled = true;
-    }
   }
-
   // Function to handle getting an answer
   function getAnswer() {
     // Get DOM elements
@@ -240,8 +233,16 @@ content %}
 
     // Check if chat ID is present in the URL
     if (!chatId) {
-      // Alert the user to add a PDF if chat ID is not present
-      alert("Please upload a PDF to ask a question.");
+      // Display a SweetAlert2 notification to prompt the user to add a PDF
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops!',
+        text: 'Please upload a PDF to ask a question.',
+        showCancelButton: false,
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6',
+      });
+
       return false;
     }
 
