@@ -1,6 +1,5 @@
 import fitz  # PyMuPDF
 import mysql.connector
-import pickle
 from config import Config
 from transformers import AutoTokenizer, AutoModel
 import torch
@@ -20,26 +19,6 @@ def getResponseFromMessages(messages):
     bot_response = chat_completion.choices[0].message.content
     print(bot_response)
     return bot_response
-
-
-def write_to_pickle(data, file_path):
-    try:
-        with open(file_path, 'wb') as file:
-            pickle.dump(data, file)
-        print("Data successfully written to pickle file:", file_path)
-    except Exception as e:
-        print("Error writing data to pickle file:", e)
-
-
-def read_from_pickle(file_path):
-    try:
-        with open(file_path, 'rb') as file:
-            data = pickle.load(file)
-        print("Data successfully read from pickle file:", file_path)
-        return data
-    except Exception as e:
-        print("Error reading data from pickle file:", e)
-        return None
 
 
 def getSQLConnection():
