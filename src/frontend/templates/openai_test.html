@@ -206,8 +206,7 @@ content %}
     const chatId = urlParams.get("chat_id");
   }
 
-  // Variable to store the saved answer on page load
-  let savedAnswerHTML = "";
+
 
   // Function to handle getting an answer
   function getAnswer() {
@@ -269,12 +268,8 @@ content %}
         if (response.codeBlock) {
           var codeBlockContainer = `<p><strong>Code Block:</strong></p><pre>${escapeHTML(response.codeBlock)}</pre>`;
           answerContent.innerHTML += conversationHTML + codeBlockContainer;
-          // Append the new content to the saved answer variable
-          savedAnswerHTML += conversationHTML + codeBlockContainer;
         } else {
           answerContent.innerHTML += conversationHTML;
-          // Append the new content to the saved answer variable
-          savedAnswerHTML += conversationHTML;
         }
 
         // Scroll to the latest content
