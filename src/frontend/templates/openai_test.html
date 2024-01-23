@@ -9,7 +9,7 @@ content %}
       Chat Title
     </h6>
     <!-- Your existing HTML structure -->
-    <div id="chatListSection" class="simplebar items-center h-96 mx-4 p-2 bg-blue-900 text-white rounded-md">
+    <div id="chatListSection" class="simplebar items-center h-96 mx-4 my-10 p-2 bg-blue-900 text-white rounded-md">
       <!-- Content will be dynamically added here -->
     </div>
   </div>
@@ -28,18 +28,22 @@ content %}
     <form onsubmit="return getAnswer()" class="mt-4">
       <!-- Input and Buttons -->
       <div class="flex flex-col md:flex-row items-center">
-        <input type="text"
-          class="form-input flex-grow p-3 md:p-3 w-full md:w-auto font-semibold border-b rounded-tl-lg border-t border-l outline-none rounded-bl-lg"
-          placeholder="Ask a Question" id="questionTextarea" name="question" oninput="toggleButton()">
-        <div class="input-group-append mt-2 md:mt-0 space-x-2">
-          <button
-            class="border-2 bg-gray-600 px-6 md:px-6 py-3 rounded-lg md:rounded-tl md:rounded-bl transition-colors relative"
-            type="button" onclick="getAnswer()" id="submitButton" disabled>
-            <i class="fas fa-arrow-up text-white" id="arrowIcon"></i>
-            <div class="absolute inset-0 flex items-center justify-center loading-spinner hidden" id="loadingSpinner">
-              <div class="rounded-full h-6 w-6 border-t-2 border-r-2 border-b-2 border-blue-500 animate-spin"></div>
-            </div>
-          </button>
+        <div class="relative flex-grow flex items-center">
+          <div class="relative w-full">
+            <input type="text"
+              class="form-input p-3 w-full font-semibold rounded-lg border-2 outline-none relative z-10"
+              placeholder="Ask a Question" id="questionTextarea" name="question" oninput="toggleButton()">
+            <button
+              class="border-2 bg-gray-600 py-2 px-3 rounded-lg md:rounded-lg transition-colors absolute right-4 top-2 bottom-2 z-20"
+              type="button" onclick="getAnswer()" id="submitButton" disabled>
+              <div class="flex items-center justify-center">
+                <i class="fas fa-arrow-up text-white" id="arrowIcon"></i>
+              </div>
+              <div class="absolute inset-0 flex items-center justify-center loading-spinner hidden" id="loadingSpinner">
+                <div class="rounded-full h-6 w-6 border-t-2 border-r-2 border-b-2 border-blue-500 animate-spin"></div>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </form>
