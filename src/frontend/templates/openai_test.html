@@ -436,7 +436,7 @@ content %}
           "text-xs",
           "text-black",
           "font-medium",
-          "bg-gray-100",
+          "bg-white",
           "rounded-sm",
           "p-2",
           "mx-2",
@@ -723,7 +723,7 @@ content %}
     chatsToDisplay.forEach(chat => {
       const chatContainer = document.createElement('div');
       chatContainer.classList.add(
-        'flex', 'flex-col', 'bg-gray-100', 'rounded', 'w-full', 'h-16',
+        'flex', 'flex-col', 'bg-white', 'rounded', 'w-full', 'h-16',
         'relative', 'shadow-md', 'my-2'
       );
 
@@ -732,9 +732,9 @@ content %}
       const accessButton = document.createElement('button');
       accessButton.textContent = chatNameWithoutDot;
       accessButton.classList.add(
-        'bg-gray-100', 'text-black', 'text-xs', 'font-medium', 'rounded',
-        'text-xs', 'cursor-pointer', 'whitespace-normal', 'overflow-hidden',
-        'hover:bg-teal-600', 'focus:outline-none', 'w-full', 'h-16'
+        'bg-white', 'text-black', 'text-xs', 'font-medium', 'rounded',
+        'text-xs', 'cursor-pointer', 'overflow-hidden',
+        'hover:bg-gray-200', 'focus:outline-none', 'w-full', 'h-16'
       );
       accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
 
