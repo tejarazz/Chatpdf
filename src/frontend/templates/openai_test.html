@@ -8,8 +8,8 @@ content %}
       class="flex justify-center m-4 p-2 font-medium text-sm bg-blue-900 text-white rounded-md h-12 overflow-hidden">
       Chat Title
     </h6>
-    <div id="chatListSection"
-      class="items flex flex-col  justify-around items-center h-96 m-4 p-2 my-11 bg-blue-900 text-white rounded-md">
+    <!-- Your existing HTML structure -->
+    <div id="chatListSection" class="simplebar items-center h-96 mx-4 p-2 bg-blue-900 text-white rounded-md">
       <!-- Content will be dynamically added here -->
     </div>
   </div>
@@ -750,27 +750,37 @@ content %}
 
   function displayChatList(chats) {
     const chatListSection = document.getElementById('chatListSection');
+    chatListSection.classList.add('simplebar');
+    chatListSection.classList.add('overflow-auto');
 
-    // Reverse the chats array
     const reversedChats = chats.slice().reverse();
-
-    // Exclude the first chat
     const chatsToDisplay = reversedChats.slice(1);
 
     chatsToDisplay.forEach(chat => {
       const chatContainer = document.createElement('div');
-      chatContainer.classList.add('flex', 'flex-col', 'bg-gray-200', 'rounded', 'w-full', 'h-16', 'relative', 'shadow-md');
+      chatContainer.classList.add(
+        'flex', 'flex-col', 'bg-gray-200', 'rounded', 'w-full', 'h-16',
+        'relative', 'shadow-md', 'my-2'
+      );
 
       const chatNameWithoutDot = chat.chat_name.endsWith('.') ? chat.chat_name.slice(0, -1) : chat.chat_name;
 
       const accessButton = document.createElement('button');
       accessButton.textContent = chatNameWithoutDot;
-      accessButton.classList.add('bg-gray-200', 'text-black', 'text-xs', 'font-medium', 'rounded', 'text-xs', 'cursor-pointer', 'whitespace-normal', 'overflow-hidden', 'hover:bg-teal-600', 'focus:outline-none', 'w-full', 'h-16');
+      accessButton.classList.add(
+        'bg-gray-200', 'text-black', 'text-xs', 'font-medium', 'rounded',
+        'text-xs', 'cursor-pointer', 'whitespace-normal', 'overflow-hidden',
+        'hover:bg-teal-600', 'focus:outline-none', 'w-full', 'h-16'
+      );
       accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
 
       const removeButton = document.createElement('button');
       removeButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
-      removeButton.classList.add('absolute', 'top-5', 'right-2', 'bg-red-500', 'text-white', 'rounded-full', 'px-2', 'py-1', 'text-xs', 'cursor-pointer', 'hover:bg-red-600', 'focus:outline-none');
+      removeButton.classList.add(
+        'absolute', 'top-5', 'right-2', 'bg-red-500', 'text-white',
+        'rounded-full', 'px-2', 'py-1', 'text-xs', 'cursor-pointer',
+        'hover:bg-red-600', 'focus:outline-none'
+      );
       removeButton.addEventListener('click', function (event) {
         event.stopPropagation();
         removeChat(chat.chat_id, chatContainer);
@@ -781,10 +791,14 @@ content %}
 
       chatListSection.appendChild(chatContainer);
     });
-  }
 
-  // Call the function to fetch and display the chat list
-  get_chat_list();
+    // Initialize SimpleBar after adding the chat list
+    const simpleBar = new SimpleBar(chatListSection, {
+      autoHide: false
+    });
+
+  };
+  get_chat_list(); // Call the function
 </script>
 
 {% endblock %}
