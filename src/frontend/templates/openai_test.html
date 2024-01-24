@@ -265,18 +265,11 @@ content %}
         var partconv = response.conversation;
 
         var conversationHTML = partconv.map((point) => {
-          // Use <strong> tags for user and assistant roles
           return `<p><strong>${point.role}:</strong> ${point.content}</p>`;
         }).join("");
 
-        if (response.codeBlock) {
-          var codeBlockContainer = `<p><strong>Code Block:</strong></p><pre>${escapeHTML(response.codeBlock)}</pre>`;
-          answerContent.innerHTML += conversationHTML + codeBlockContainer;
-        } else {
-          answerContent.innerHTML += conversationHTML;
-        }
+        answerContent.innerHTML += conversationHTML;
 
-        // Scroll to the latest content
         answerContent.lastElementChild.scrollIntoView({ behavior: "smooth" });
 
         answerContainer.style.display = "block";
@@ -302,7 +295,6 @@ content %}
 
     return false;
   }
-
   // Call initializeForm to set the initial state of the form
   initializeForm();
 
