@@ -211,7 +211,6 @@ content %}
   }
 
 
-
   // Function to handle getting an answer
   function getAnswer() {
     var questionInput = document.getElementById("questionTextarea");
@@ -265,7 +264,23 @@ content %}
         var partconv = response.conversation;
 
         var conversationHTML = partconv.map((point) => {
-          return `<p><strong>${point.role}:</strong> ${point.content}</p>`;
+          var content = point.content;
+
+          // Check if content contains code block
+          if (/^```html[\s\S]+```$/.test(content)) {
+            // Extract HTML code content between backticks
+            var codeContent = content.replace(/^```html|```$/g, '');
+            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre class="language-html">${Prism.highlight(codeContent, Prism.languages.html, 'html')}</pre></div>`;
+          } else if (/^```[^`]+```$/.test(content)) {
+            // Extract code content between backticks and format for other languages
+            var codeContent = content.replace(/^```|```$/g, '');
+            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre>${Prism.highlight(codeContent, Prism.languages.auto, 'auto')}</pre></div>`;
+          } else {
+            // Split content into lines and remove backticks
+            var lines = content.split('\n').map(line => line.replace(/`/g, ''));
+            var formattedContent = lines.join('<br>');
+            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><p class="font-bold">${point.role}:</p> ${formattedContent}</div>`;
+          }
         }).join("");
 
         answerContent.innerHTML += conversationHTML;
@@ -275,15 +290,6 @@ content %}
         answerContainer.style.display = "block";
 
         saveAnswer(partconv);
-
-        submitButton.disabled = false;
-        loadingSpinner.classList.add("hidden");
-        arrowIcon.style.visibility = "visible";
-        submitButton.style.backgroundColor = "gray";
-      })
-      .catch((error) => {
-        answerContent.innerHTML = "An error occurred. Please try again.";
-        console.error("Error:", error);
 
         submitButton.disabled = false;
         loadingSpinner.classList.add("hidden");
