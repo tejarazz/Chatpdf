@@ -189,6 +189,9 @@ content %}
     // Update button state and appearance
     submitButton.disabled = !hasText;
     submitButton.style.backgroundColor = hasText ? "darkblue" : "gray";
+
+    // Set cursor pointer style based on button state
+    submitButton.style.cursor = submitButton.disabled ? "not-allowed" : "pointer";
   }
 
   // Function to retrieve saved answer from local storage
@@ -208,6 +211,7 @@ content %}
     var submitButton = document.getElementById("submitButton");
     const urlParams = new URLSearchParams(window.location.search);
     const chatId = urlParams.get("chat_id");
+    submitButton.style.cursor = "default";
   }
 
 
@@ -244,6 +248,7 @@ content %}
     submitButton.disabled = true;
     loadingSpinner.classList.remove("hidden");
     arrowIcon.style.visibility = "hidden";
+    submitButton.style.cursor = "default";
 
     fetch(`http://127.0.0.1:5000/ask-question/${chatId}`, {
       method: "POST",
@@ -295,6 +300,7 @@ content %}
         loadingSpinner.classList.add("hidden");
         arrowIcon.style.visibility = "visible";
         submitButton.style.backgroundColor = "gray";
+        submitButton.style.cursor = "default";
       });
 
     questionInput.value = "";
