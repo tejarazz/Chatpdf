@@ -373,16 +373,17 @@ content %}
     }
   }
 
-  function generateFileItems(fileList) {
-    const fileContainer = document.getElementById("fileList");
+  const fileContainer = new SimpleBar(document.getElementById("fileList"));
 
+  function generateFileItems(fileList) {
     // Clear existing file items
-    fileContainer.innerHTML = "";
+    fileContainer.getContentElement().innerHTML = "";
 
     fileList.forEach(({ file_name: fileName, file_path, file_size, last_modified }) => {
       const fileItem = document.createElement("div");
       fileItem.classList.add(
         "mb-3",
+        "mr-3",
         "border",
         "p-3",
         "file-item",
@@ -410,7 +411,7 @@ content %}
       fileItem.appendChild(label);
 
       // Append the file item to the file container
-      fileContainer.appendChild(fileItem);
+      fileContainer.getContentElement().appendChild(fileItem);
     });
   }
 
@@ -568,7 +569,6 @@ content %}
       sendRequestToServer(selectedFileNames);
 
       // Optionally, you can perform additional actions here if needed
-      // ...
 
       // Clear the selection by unchecking all checkboxes
       checkboxes.forEach((checkbox) => {
@@ -577,7 +577,6 @@ content %}
     } else {
       console.log("Please select a file before creating a chat.");
       // Optionally, you can provide feedback to the user in the UI
-      // ...
     }
   }
 
