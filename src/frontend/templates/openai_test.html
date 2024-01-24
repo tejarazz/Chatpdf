@@ -5,11 +5,11 @@ content %}
   <!-- Section 1: Categories -->
   <div class="section1 flex flex-col md:w-2/12 h-full pt-12">
     <h6 id="chatTitle"
-      class="flex justify-center m-4 p-2 font-medium text-sm bg-blue-800 text-white rounded-md h-12 overflow-hidden">
+      class="flex justify-center m-4 mt-2 p-2 font-medium text-sm bg-blue-800 text-white rounded-md h-12 overflow-hidden">
       Chat Title
     </h6>
     <!-- Your existing HTML structure -->
-    <div id="chatListSection" class="simplebar items-center h-96 mx-4 my-10 p-2 bg-blue-800 text-white rounded-md">
+    <div id="chatListSection" class="simplebar items-center h-96 mx-4 my-12 p-2 bg-blue-800 text-white rounded-md">
       <!-- Content will be dynamically added here -->
     </div>
   </div>
@@ -34,13 +34,13 @@ content %}
               class="form-input p-3 w-full font-semibold rounded-lg border-2 outline-none relative z-10"
               placeholder="Ask a Question" id="questionTextarea" name="question" oninput="toggleButton()">
             <button
-              class="border-2 bg-gray-600 py-2 px-3 rounded-lg md:rounded-lg transition-colors absolute right-4 top-2 bottom-2 z-20"
+              class="border-2 bg-gray-500 py-2 px-3 rounded-lg md:rounded-lg transition-colors absolute right-4 top-2 bottom-2 z-20"
               type="button" onclick="getAnswer()" id="submitButton" disabled>
               <div class="flex items-center justify-center">
                 <i class="fas fa-arrow-up text-white" id="arrowIcon"></i>
               </div>
               <div class="absolute inset-0 flex items-center justify-center loading-spinner hidden" id="loadingSpinner">
-                <div class="rounded-full h-6 w-6 border-t-2 border-r-2 border-b-2 border-blue-500 animate-spin"></div>
+                <div class="rounded-full h-6 w-6 border-t-2 border-r-2 border-b-2 border-white animate-spin"></div>
               </div>
             </button>
           </div>
@@ -53,7 +53,7 @@ content %}
   <!-- Section 3: File and Chat List -->
   <div class="section3 flex flex-col md:w-2/12 pt-12 h-full">
     <!-- Chat List -->
-    <div class="flex flex-col m-4 h-40 border border-black text-white rounded-md bg-blue-800">
+    <div class="flex flex-col m-4 mt-2 h-40 border border-black text-white rounded-md bg-blue-800">
       <h6 class="flex font-bold justify-center">Chat with</h6>
       <div id="pdfList" class="sitems flex flex-col py-2">
         <!-- PDF names will be dynamically added here -->
