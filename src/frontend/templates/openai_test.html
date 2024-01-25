@@ -192,8 +192,31 @@ content %}
 
     // Set cursor pointer style based on button state
     submitButton.style.cursor = submitButton.disabled ? "not-allowed" : "pointer";
+
+    // Call the resizeTextarea function to dynamically adjust textarea height
+    resizeTextarea(questionInput);
   }
 
+  // Function to dynamically adjust textarea height
+  function resizeTextarea(textarea) {
+    // Set a maximum height for the textarea
+    var maxHeight = 100; // Adjust this value as needed
+
+    // Calculate the scroll height of the content
+    var scrollHeight = textarea.scrollHeight;
+
+    // Show the vertical scrollbar only if the content height exceeds the maxHeight
+    textarea.style.overflowY = scrollHeight > maxHeight ? "auto" : "hidden";
+
+    // Reset height to default if the textarea is empty
+    textarea.style.height = textarea.value.trim() === "" ? "" : Math.min(scrollHeight, maxHeight) + "px";
+  }
+
+  // Add an event listener to handle changes in textarea value
+  var questionInput = document.getElementById("questionTextarea");
+  questionInput.addEventListener("input", function () {
+    resizeTextarea(questionInput);
+  });
 
   function handleKeyDown(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
