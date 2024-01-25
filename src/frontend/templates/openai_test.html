@@ -29,12 +29,12 @@ content %}
       <!-- Input and Buttons -->
       <div class="flex flex-col md:flex-row items-center">
         <div class="relative flex-grow flex items-center">
-          <div class="relative w-full">
-            <input type="text"
-              class="form-input p-3 w-full font-semibold rounded-lg border-2 outline-none relative z-10"
-              placeholder="Ask a Question" id="questionTextarea" name="question" oninput="toggleButton()">
+          <div class="relative w-full flex">
+            <textarea class="form-input p-3 w-full font-semibold rounded-lg border-2 outline-none resize-none"
+              placeholder="Ask a Question" id="questionTextarea" name="question" rows="1" oninput="toggleButton()"
+              onkeydown="handleKeyDown(event)"></textarea>
             <button
-              class="border-2 bg-gray-500 py-2 px-3 rounded-lg md:rounded-lg transition-colors absolute right-4 top-2 bottom-2 z-20"
+              class="border-2 bg-gray-500 py-2 px-3 rounded-lg md:rounded-lg transition-colors absolute right-4 top-1/2 transform -translate-y-1/2 z-20"
               type="button" onclick="getAnswer()" id="submitButton" disabled>
               <div class="flex items-center justify-center">
                 <i class="fas fa-arrow-up text-white" id="arrowIcon"></i>
@@ -192,6 +192,14 @@ content %}
 
     // Set cursor pointer style based on button state
     submitButton.style.cursor = submitButton.disabled ? "not-allowed" : "pointer";
+  }
+
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault(); // Prevents adding a newline
+      getAnswer(); // Call your form submission function
+    }
   }
 
   // Function to retrieve saved answer from local storage
