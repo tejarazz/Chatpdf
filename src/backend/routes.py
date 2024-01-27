@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify
-from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list, del_chat
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list, del_chat, update_chatname
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -144,6 +144,26 @@ def load_chat(chat_id):
         else:
             # If chat_id not found or other errors, return an error response
             return jsonify({"error": chat_data["error"]}), 404 if "Chat not found" in chat_data["error"] else 500
+
+    except Exception as e:
+        # Handle other potential errors
+        return jsonify({"error": str(e)}), 500
+
+
+def update_chat_name():
+    try:
+        # Get parameters from the request (assuming JSON data is sent in the request body)
+        data = request.get_json()
+        chat_id = data.get('chat_id')
+        new_chat_name = data.get('new_chat_name')
+
+        # Call the function to update the chat name
+        success, result = update_chatname(chat_id, new_chat_name)
+
+        if success:
+            return jsonify(result)
+        else:
+            return jsonify({"error": result["error"]}), 500
 
     except Exception as e:
         # Handle other potential errors

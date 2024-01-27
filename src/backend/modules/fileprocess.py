@@ -1,4 +1,4 @@
-from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQuery, runSelectQuery, runDeleteQuery
+from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQuery, runSelectQuery, runDeleteQuery, runUpdateQuery
 import os
 import json
 
@@ -161,6 +161,20 @@ def rem_doc(chat_id):
         delete_query = 'DELETE FROM chat_info WHERE documents = %s'
         runDeleteQuery(delete_query, values)
         return True, {"message": "Document removed successfully"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
+        return False, {"error": str(e)}
+
+
+def update_chatname(chat_id, new_chat_name):
+    try:
+        values = (new_chat_name, chat_id)
+        # update the chat with the specified chat_id
+        update_query = 'UPDATE chat_info SET chat_name = %s WHERE chat_id = %s'
+        runUpdateQuery(update_query, values)
+        return True, {"message": "Chat name updated successfully"}
 
     except Exception as e:
         # Handle other potential errors and return False and an error message

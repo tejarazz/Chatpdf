@@ -1,6 +1,6 @@
 # app.py
 
-from routes import add_document, ask_question, create_chat, delete_chat, file_upload, list_all_chats, load_chat, remove_document, list_files
+from routes import add_document, ask_question, create_chat, delete_chat, file_upload, list_all_chats, load_chat, remove_document, list_files, update_chat_name
 from flask import Flask
 from flask_cors import CORS
 from db import configure_database
@@ -36,6 +36,10 @@ def create_app():
                      'load_chat', load_chat, methods=['GET'])
     app.add_url_rule('/ask-question/<int:chat_id>',
                      'ask_question', ask_question, methods=['POST'])
+    app.add_url_rule('/ask-question/<int:chat_id>',
+                     'ask_question', ask_question, methods=['POST'])
+    app.add_url_rule('/update_chatname',
+                     'update_chatname', update_chat_name, methods=['POST'])
 
     # New route to list all files
     app.add_url_rule('/list-files', 'list_files', list_files, methods=['GET'])

@@ -797,8 +797,50 @@ content %}
       renameOption.classList.add('py-2', 'px-4', 'cursor-pointer', 'hover:bg-gray-700');
       renameOption.addEventListener('click', function (event) {
         event.stopPropagation();
-        // Implement the rename functionality here
-        console.log('Rename chat functionality to be implemented');
+
+        // Create an input element
+        const inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.value = chat.chat_name;
+        inputElement.classList.add('border', 'border-gray-300', 'p-2', 'text-gray-700', 'rounded', 'outline-none', 'focus:border-blue-500');
+
+        // Replace the accessButton content with the input element
+        accessButton.innerHTML = '';
+        accessButton.appendChild(inputElement);
+
+        // Focus on the input element
+        inputElement.focus();
+
+        // Listen for blur event on input element
+        inputElement.addEventListener('blur', async function () {
+          const newChatName = inputElement.value.trim();
+
+          try {
+            // Call the updateChatName function asynchronously to update the database
+            await updateChatName(chat.chat_id, newChatName);
+
+            // If the user didn't change the name, restore the original chat name
+            if (!newChatName) {
+              inputElement.value = chat.chat_name;
+            } else {
+              // Update the global chat variable with the new name
+              chat.chat_name = newChatName;
+            }
+          } catch (error) {
+            console.error('Error updating chat name:', error);
+            // Handle the error appropriately (e.g., display an error message to the user)
+          } finally {
+            // Remove the input element and restore the original content
+            accessButton.innerHTML = chat.chat_name;
+          }
+        });
+
+        // Listen for Enter key press on input element
+        inputElement.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            inputElement.blur();
+          }
+        });
       });
 
       moreOptionsButton.addEventListener('click', function (event) {
@@ -842,6 +884,28 @@ content %}
     return function () {
       accessChat(chat.chat_id);
     };
+  }
+
+  // Function to update chat name
+  function updateChatName(chatId, newChatName) {
+    fetch('http://127.0.0.1:5000/update_chatname', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        new_chat_name: newChatName,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        // Handle the response from the server, e.g., show success message or handle errors
+        console.log(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   }
 
   // Call the function after defining it
