@@ -8,8 +8,9 @@ content %}
       class="flex justify-center m-4 mt-2 p-2 font-medium text-sm bg-blue-800 text-white rounded-md h-12 overflow-hidden">
       Chat Title
     </h6>
-    <!-- Your existing HTML structure -->
-    <div id="chatListSection" class="simplebar items-center h-96 mx-4 my-12 p-2 bg-blue-800 text-white rounded-md">
+
+    <div id="chatListSection"
+      class="simplebar items-center h-96 mx-4 my-12 p-2 bg-blue-800 text-white rounded-md overflow-auto">
       <!-- Content will be dynamically added here -->
     </div>
   </div>
@@ -721,15 +722,9 @@ content %}
     window.location.href = chatUrl;
   }
 
-  function createButtonClickHandler(chat, chatContainer) {
-    return function () {
-      accessChat(chat.chat_id);
-    };
-  }
-
   async function removeChat(chat_id, chatContainer) {
     try {
-      const response = await fetch(`http://127.0.0.1:5000//delete-chat/${chat_id}`, {
+      const response = await fetch(`http://127.0.0.1:5000/delete-chat/${chat_id}`, {
         method: 'DELETE',
       });
 
@@ -753,6 +748,8 @@ content %}
     const reversedChats = chats.slice().reverse();
     const chatsToDisplay = reversedChats.slice(1);
 
+    document.addEventListener('click', closeOptionsDropdown);
+
     chatsToDisplay.forEach(chat => {
       const chatContainer = document.createElement('div');
       chatContainer.classList.add(
@@ -762,29 +759,67 @@ content %}
 
       const chatNameWithoutDot = chat.chat_name.endsWith('.') ? chat.chat_name.slice(0, -1) : chat.chat_name;
 
+      const chatButtonContainer = document.createElement('div');
+      chatButtonContainer.classList.add('relative');
+
       const accessButton = document.createElement('button');
       accessButton.textContent = chatNameWithoutDot;
       accessButton.classList.add(
         'bg-white', 'text-black', 'text-xs', 'font-medium', 'rounded',
-        'text-xs', 'cursor-pointer', 'overflow-hidden',
+        'text-xs', 'cursor-pointer', 'overflow-hidden', 'text-left', 'pl-4',
         'hover:bg-gray-200', 'focus:outline-none', 'w-full', 'h-16'
       );
       accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
 
-      const removeButton = document.createElement('button');
-      removeButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
-      removeButton.classList.add(
-        'absolute', 'top-5', 'right-2', 'bg-red-500', 'text-white',
-        'rounded-full', 'px-2', 'py-1', 'text-xs', 'cursor-pointer',
-        'hover:bg-red-600', 'focus:outline-none'
+      const moreOptionsButton = document.createElement('button');
+      moreOptionsButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
+      moreOptionsButton.classList.add(
+        'absolute', 'top-5', 'right-2', 'bg-white', 'text-black',
+        'rounded-full', 'px-2', 'py-1', 'text-xs', 'cursor-pointer', 'focus:outline-none', 'hover:text-gray-600'
       );
-      removeButton.addEventListener('click', function (event) {
+
+      const optionsDropdown = document.createElement('div');
+      optionsDropdown.classList.add(
+        'hidden', 'absolute', 'right-0', 'top-12', 'bg-gray-900', 'border', 'border-gray-300',
+        'rounded-md', 'shadow-md', 'z-10', 'text-sm', 'options-dropdown' // Added a class for easier selection
+      );
+
+      const deleteOption = document.createElement('div');
+      deleteOption.innerHTML = '<i class="fas fa-trash"></i> Delete Chat';
+      deleteOption.classList.add('py-2', 'px-4', 'text-red-500', 'cursor-pointer', 'hover:bg-gray-700');
+      deleteOption.addEventListener('click', function (event) {
         event.stopPropagation();
         removeChat(chat.chat_id, chatContainer);
       });
 
-      chatContainer.appendChild(accessButton);
-      chatContainer.appendChild(removeButton);
+      const renameOption = document.createElement('div');
+      renameOption.textContent = 'Rename Chat';
+      renameOption.classList.add('py-2', 'px-4', 'cursor-pointer', 'hover:bg-gray-700');
+      renameOption.addEventListener('click', function (event) {
+        event.stopPropagation();
+        // Implement the rename functionality here
+        console.log('Rename chat functionality to be implemented');
+      });
+
+      moreOptionsButton.addEventListener('click', function (event) {
+        event.stopPropagation();
+        // Close all open dropdowns before opening the clicked one
+        document.querySelectorAll('.options-dropdown').forEach(function (dropdown) {
+          if (dropdown !== optionsDropdown) {
+            dropdown.classList.add('hidden');
+          }
+        });
+        optionsDropdown.classList.toggle('hidden');
+      });
+
+      optionsDropdown.appendChild(deleteOption);
+      optionsDropdown.appendChild(renameOption);
+
+      chatButtonContainer.appendChild(accessButton);
+      chatButtonContainer.appendChild(moreOptionsButton);
+
+      chatContainer.appendChild(chatButtonContainer);
+      chatContainer.appendChild(optionsDropdown);
 
       chatListSection.appendChild(chatContainer);
     });
@@ -794,8 +829,24 @@ content %}
       autoHide: false
     });
 
-  };
-  get_chat_list(); // Call the function
+    function closeOptionsDropdown() {
+      // Close the options dropdown when clicking outside the chat list
+      document.querySelectorAll('.options-dropdown').forEach(function (dropdown) {
+        dropdown.classList.add('hidden');
+      });
+    }
+  }
+
+  // Replace this with your actual click handler implementation
+  function createButtonClickHandler(chat, chatContainer) {
+    return function () {
+      accessChat(chat.chat_id);
+    };
+  }
+
+  // Call the function after defining it
+  get_chat_list();
+
 </script>
 
 {% endblock %}
