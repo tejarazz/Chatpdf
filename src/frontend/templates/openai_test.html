@@ -782,14 +782,14 @@ content %}
       // Create the options dropdown
       const optionsDropdown = document.createElement('div');
       optionsDropdown.classList.add(
-        'hidden', 'absolute', 'right-0', 'top-10', 'bg-gray-800', 'border', 'border-gray-600',
-        'rounded-md', 'shadow-md', 'z-10', 'text-sm', 'options-dropdown' // Added a class for easier selection
+        'hidden', 'absolute', 'right-0', 'top-11', 'bg-gray-900', 'border',
+        'rounded-md', 'z-10', 'text-sm', 'options-dropdown' // Added a class for easier selection
       );
 
       // Create the "Delete Chat" option
       const deleteOption = document.createElement('div');
       deleteOption.innerHTML = '<i class="fas fa-trash"></i><span class="ml-2">Delete Chat</span>';
-      deleteOption.classList.add('py-2', 'px-4', 'text-red-500', 'cursor-pointer', 'text-xs', 'hover:bg-gray-700', 'hover:text-red-400');
+      deleteOption.classList.add('py-3', 'px-6', 'text-red-600', 'rounded-md', 'cursor-pointer', 'text-xs', 'hover:bg-gray-800');
       deleteOption.addEventListener('click', function (event) {
         event.stopPropagation();
         removeChat(chat.chat_id, chatContainer);
@@ -798,7 +798,7 @@ content %}
       // Create the "Rename" option
       const renameOption = document.createElement('div');
       renameOption.innerHTML = '<i class="fas fa-edit"></i><span class="ml-2">Rename</span>';
-      renameOption.classList.add('py-2', 'px-4', 'cursor-pointer', 'text-xs', 'hover:bg-gray-700', 'flex', 'items-center');
+      renameOption.classList.add('py-3', 'px-6', 'cursor-pointer', 'rounded-md', 'text-xs', 'hover:bg-gray-800', 'flex', 'items-center');
       renameOption.addEventListener('click', function (event) {
         event.stopPropagation();
 
@@ -806,7 +806,7 @@ content %}
         const inputElement = document.createElement('input');
         inputElement.type = 'text';
         inputElement.value = chat.chat_name;
-        inputElement.classList.add('border', 'border-gray-300', 'p-1', 'text-gray-700', 'rounded', 'outline-none', 'focus:border-black');
+        inputElement.classList.add('border', 'border-gray-300', 'p-1', 'text-black', 'rounded-sm');
 
         // Replace the accessButton content with the input element
         accessButton.innerHTML = '';
