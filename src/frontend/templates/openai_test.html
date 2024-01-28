@@ -771,30 +771,34 @@ content %}
       );
       accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
 
+      // Create the "More Options" button
       const moreOptionsButton = document.createElement('button');
       moreOptionsButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
       moreOptionsButton.classList.add(
-        'absolute', 'top-5', 'right-2', 'bg-white', 'text-black',
-        'rounded-full', 'px-2', 'py-1', 'text-xs', 'cursor-pointer', 'focus:outline-none', 'hover:text-gray-600'
+        'absolute', 'top-3', 'right-2', 'text-black',
+        'rounded-full', 'px-2', 'py-3', 'text-xs', 'cursor-pointer', 'focus:outline-none', 'hover:text-gray-400'
       );
 
+      // Create the options dropdown
       const optionsDropdown = document.createElement('div');
       optionsDropdown.classList.add(
-        'hidden', 'absolute', 'right-0', 'top-12', 'bg-gray-900', 'border', 'border-gray-300',
+        'hidden', 'absolute', 'right-0', 'top-10', 'bg-gray-800', 'border', 'border-gray-600',
         'rounded-md', 'shadow-md', 'z-10', 'text-sm', 'options-dropdown' // Added a class for easier selection
       );
 
+      // Create the "Delete Chat" option
       const deleteOption = document.createElement('div');
-      deleteOption.innerHTML = '<i class="fas fa-trash"></i> Delete Chat';
-      deleteOption.classList.add('py-2', 'px-4', 'text-red-500', 'cursor-pointer', 'hover:bg-gray-700');
+      deleteOption.innerHTML = '<i class="fas fa-trash"></i><span class="ml-2">Delete Chat</span>';
+      deleteOption.classList.add('py-2', 'px-4', 'text-red-500', 'cursor-pointer', 'text-xs', 'hover:bg-gray-700', 'hover:text-red-400');
       deleteOption.addEventListener('click', function (event) {
         event.stopPropagation();
         removeChat(chat.chat_id, chatContainer);
       });
 
+      // Create the "Rename" option
       const renameOption = document.createElement('div');
-      renameOption.textContent = 'Rename';
-      renameOption.classList.add('py-2', 'px-4', 'cursor-pointer', 'hover:bg-gray-700');
+      renameOption.innerHTML = '<i class="fas fa-edit"></i><span class="ml-2">Rename</span>';
+      renameOption.classList.add('py-2', 'px-4', 'cursor-pointer', 'text-xs', 'hover:bg-gray-700', 'flex', 'items-center');
       renameOption.addEventListener('click', function (event) {
         event.stopPropagation();
 
@@ -802,7 +806,7 @@ content %}
         const inputElement = document.createElement('input');
         inputElement.type = 'text';
         inputElement.value = chat.chat_name;
-        inputElement.classList.add('border', 'border-gray-300', 'p-2', 'text-gray-700', 'rounded', 'outline-none', 'focus:border-blue-500');
+        inputElement.classList.add('border', 'border-gray-300', 'p-1', 'text-gray-700', 'rounded', 'outline-none', 'focus:border-black');
 
         // Replace the accessButton content with the input element
         accessButton.innerHTML = '';
@@ -835,10 +839,23 @@ content %}
           }
         });
 
-        // Listen for Enter key press on input element
+        // Listen for keydown event on input element
         inputElement.addEventListener('keydown', function (event) {
+          // Prevent default action for spacebar key
+          if (event.key === ' ' || event.code === 'Space') {
+            event.preventDefault();
+
+            // Check if there are already spaces in the input
+            if (!inputElement.value.includes(' ')) {
+              // Add a space to the input
+              inputElement.value += ' ';
+            }
+          }
+
+          // If Enter key is pressed, blur the input element and close the dropdown
           if (event.key === 'Enter') {
             inputElement.blur();
+            closeOptionsDropdown();
           }
         });
       });
@@ -854,8 +871,8 @@ content %}
         optionsDropdown.classList.toggle('hidden');
       });
 
-      optionsDropdown.appendChild(deleteOption);
       optionsDropdown.appendChild(renameOption);
+      optionsDropdown.appendChild(deleteOption);
 
       chatButtonContainer.appendChild(accessButton);
       chatButtonContainer.appendChild(moreOptionsButton);
