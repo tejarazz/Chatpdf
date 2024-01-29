@@ -168,8 +168,15 @@ content %}
 
     document.getElementById("fileInput").addEventListener("change", updatePdfList);
 
+
+    // Call loadChat to initiate the process
+    loadChat();
+
     // Fetch the initial file list after the DOM is ready
     fetchFileList();
+
+    // Call initializeForm to set the initial state of the form
+    initializeForm();
   });
 
   // Function to toggle the visibility of the modal
@@ -337,9 +344,6 @@ content %}
 
     return false;
   }
-
-  // Call initializeForm to set the initial state of the form
-  initializeForm();
 
   // Function to update the list of PDFs
   async function updatePdfList() {
@@ -571,12 +575,6 @@ content %}
         console.error("Error:", error.message);
       });
   }
-
-  // Call loadChat to initiate the process
-  loadChat();
-
-  // Call fetchFileList to initiate the process
-  fetchFileList();
 
   // Function to create a chat
   function createChat() {

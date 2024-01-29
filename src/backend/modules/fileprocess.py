@@ -1,4 +1,4 @@
-from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQuery, runSelectQuery, runDeleteQuery, runUpdateQuery
+from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQuery, runSelectQuery, runDeleteQuery, runUpdateQuery, cosine_similarity, get_embeddings_of_text
 import os
 import json
 
@@ -175,6 +175,47 @@ def update_chatname(chat_id, new_chat_name):
         update_query = 'UPDATE chat_info SET chat_name = %s WHERE chat_id = %s'
         runUpdateQuery(update_query, values)
         return True, {"message": "Chat name updated successfully"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
+        return False, {"error": str(e)}
+
+
+def get_embeddings_of_doc(doc_name):
+
+    try:
+        fetch_filedata_query = f"SELECT text_json , embeddings_json FROM file_data WHERE file_name ='{doc_name}'"
+        file_data = runSelectQuery(fetch_filedata_query)
+
+        data = {
+
+        }
+
+        data['text_json'] = json.loads(file_data[0][0])
+        data['embeddings_json'] = json.loads(file_data[0][1])
+
+        return True, data
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
+        return False, {"error": str(e)}
+
+
+# Find similar chunks from document
+
+def get_similar_chunks(data, question):
+
+    try:
+        question_emb = get_embeddings_of_text(question)
+        print("Question Embedding:", question_emb)
+        print("Keys in embeddings_json:", data['embeddings_json'].keys())
+        emb_similarity_scores = {page_no: cosine_similarity(
+            question_emb, data['embeddings_json'][page_no]) for page_no in data['embeddings_json'].keys()}
+        print("Emb Similarity Scores:", emb_similarity_scores)
+
+        return emb_similarity_scores
 
     except Exception as e:
         # Handle other potential errors and return False and an error message

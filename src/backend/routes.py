@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify
-from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list, del_chat, update_chatname
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list, del_chat, update_chatname, get_embeddings_of_doc, get_similar_chunks
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -178,6 +178,22 @@ def ask_question(chat_id):
 
         user_id = 1
         status, data = load_chat_data(chat_id)
+        # Extract document name from the chat(data)
+
+        doc_names = data["documents"]
+
+        # Fetch the embeddings from the document name
+
+        embs = [get_embeddings_of_doc(doc_name)[1] for doc_name in doc_names]
+
+        print(get_embeddings_of_doc(doc_names[0])[1]['embeddings_json']["0"])
+        # Find the similarities of each embedding chunk with the question.Also find the top similar chunks.
+
+        similarity = [get_similar_chunks(
+            data_, question_text) for data_ in embs]
+        print(similarity)
+
+        # TODO: design a prompt that takes the top similar chunks and asks the question to LLM.
         messages = data['conversation']
         q = {
             "role": "user",

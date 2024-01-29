@@ -1,3 +1,5 @@
+from numpy.linalg import norm
+import numpy as np
 import fitz  # PyMuPDF
 import mysql.connector
 from config import Config
@@ -165,6 +167,57 @@ def get_text_embeddings(text_dict):
                        embedding in zip(text_dict.keys(), embeddings)}
 
     return embeddings_dict
+
+
+def get_embeddings_of_text(text, model_name="bert-base-uncased"):
+    """
+    Get BERT embeddings for a given text.
+
+    Parameters:
+    - text: str, input text for which embeddings are needed
+    - model_name: str, BERT model name (default: "bert-base-uncased")
+
+    Returns:
+    - embeddings: torch.Tensor, contextualized embeddings for each token in the input text
+    """
+    # Load BERT model and tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name)
+
+    # Tokenize input text
+    tokens = tokenizer(text, return_tensors='pt')
+
+    # Forward pass through the BERT model
+    with torch.no_grad():
+        outputs = model(**tokens)
+
+    # Extract embeddings from the last layer
+    embeddings = outputs.last_hidden_state.squeeze(0)
+
+    # You can use the mean pooling or any other pooling strategy if needed
+    # Apply mean pooling along the sequence length dimension
+    mean_pooling = torch.mean(embeddings, dim=1)
+
+    return mean_pooling.numpy()
+
+
+def cosine_similarity(embedding1, embedding2):
+    """
+    Calculate cosine similarity between two embeddings.
+
+    Parameters:
+    - embedding1: numpy array, the first embedding vector
+    - embedding2: numpy array, the second embedding vector
+
+    Returns:
+    - similarity: float, cosine similarity between the two embeddings
+    """
+    dot_product = np.dot(embedding1, embedding2)
+    norm_embedding1 = norm(embedding1)
+    norm_embedding2 = norm(embedding2)
+
+    similarity = dot_product / (norm_embedding1 * norm_embedding2)
+    return similarity
 
 
 # def get_q_text_embeddings(text_input):
