@@ -209,13 +209,17 @@ def get_similar_chunks(data, question):
 
     try:
         question_emb = get_embeddings_of_text(question)
-        print("Question Embedding:", question_emb)
-        print("Keys in embeddings_json:", data['embeddings_json'].keys())
+        # print("Keys in embeddings_json:", data['embeddings_json'].keys())
         emb_similarity_scores = {page_no: cosine_similarity(
             question_emb, data['embeddings_json'][page_no]) for page_no in data['embeddings_json'].keys()}
-        print("Emb Similarity Scores:", emb_similarity_scores)
-
-        return emb_similarity_scores
+        # Filter pages with similarity scores above or equal to the threshold
+        relevant_page_nos = [page_no for page_no,
+                             score in emb_similarity_scores.items() if score >= 0.4]
+        print(emb_similarity_scores)
+        print(relevant_page_nos)
+        relevant_page_texts = {page_no: text for page_no,
+                               text in data['text_json'].items() if page_no in relevant_page_nos}
+        return relevant_page_texts
 
     except Exception as e:
         # Handle other potential errors and return False and an error message

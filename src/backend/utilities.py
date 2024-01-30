@@ -3,8 +3,8 @@ import numpy as np
 import fitz  # PyMuPDF
 import mysql.connector
 from config import Config
-from transformers import AutoTokenizer, AutoModel
-import torch
+from langchain.embeddings import HuggingFaceEmbeddings
+from typing import List
 import openai
 import os
 
@@ -145,60 +145,55 @@ def read_pdf(file_path):
     return output
 
 
-def get_text_embeddings(text_dict):
+def get_text_embeddings(text_dict: dict) -> dict:
+    """
+    Get embeddings for a dictionary of text using HuggingFaceEmbeddings.
 
-    # Load pre-trained BERT tokenizer and model
-    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-    model = AutoModel.from_pretrained("bert-base-uncased")
+    Parameters:
+    - text_dict: dict, a dictionary where keys are document names and values are text content
 
-    # Tokenize all input texts
-    inputs = tokenizer(list(text_dict.values()), return_tensors="pt",
-                       padding=True, truncation=True, max_length=512)
+    Returns:
+    - embeddings_dict: dict, a dictionary where keys are document names and values are embeddings
+    """
+    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_kwargs = {'device': 'cpu'}
+    encode_kwargs = {'normalize_embeddings': False}
+    hf = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
+    )
 
-    # Forward pass through the BERT model
-    with torch.no_grad():
-        outputs = model(**inputs)
+    texts = list(text_dict.values())
+    embeddings = hf.embed_documents(texts)
 
-    # Extract the embeddings from the last layer (CLS token)
-    embeddings = outputs.last_hidden_state.mean(dim=1).numpy()
-
-    # Store the embeddings in the dictionary
-    embeddings_dict = {key: embedding.tolist() for key,
-                       embedding in zip(text_dict.keys(), embeddings)}
-
+    # Ensure that each embedding is converted to a list
+    embeddings_dict = {key: embedding if isinstance(embedding, list) else embedding.tolist()
+                       for key, embedding in zip(text_dict.keys(), embeddings)}
     return embeddings_dict
 
 
-def get_embeddings_of_text(text, model_name="bert-base-uncased"):
+def get_embeddings_of_text(text: str) -> List[float]:
     """
-    Get BERT embeddings for a given text.
+    Get embeddings for a single text using HuggingFaceEmbeddings.
 
     Parameters:
     - text: str, input text for which embeddings are needed
-    - model_name: str, BERT model name (default: "bert-base-uncased")
 
     Returns:
-    - embeddings: torch.Tensor, contextualized embeddings for each token in the input text
+    - embeddings: List[float], embeddings for the input text
     """
-    # Load BERT model and tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = AutoModel.from_pretrained(model_name)
+    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_kwargs = {'device': 'cpu'}
+    encode_kwargs = {'normalize_embeddings': False}
+    hf = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
+    )
 
-    # Tokenize input text
-    tokens = tokenizer(text, return_tensors='pt')
-
-    # Forward pass through the BERT model
-    with torch.no_grad():
-        outputs = model(**tokens)
-
-    # Extract embeddings from the last layer
-    embeddings = outputs.last_hidden_state.squeeze(0)
-
-    # You can use the mean pooling or any other pooling strategy if needed
-    # Apply mean pooling along the sequence length dimension
-    mean_pooling = torch.mean(embeddings, dim=1)
-
-    return mean_pooling.numpy()
+    embedding = hf.embed_query(text)
+    return embedding
 
 
 def cosine_similarity(embedding1, embedding2):
@@ -218,38 +213,3 @@ def cosine_similarity(embedding1, embedding2):
 
     similarity = dot_product / (norm_embedding1 * norm_embedding2)
     return similarity
-
-
-# def get_q_text_embeddings(text_input):
-#     # Load pre-trained BERT tokenizer and model
-#     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-#     model = AutoModel.from_pretrained("bert-base-uncased")
-
-#     # Check if the input is a single text or a dictionary of texts
-#     if isinstance(text_input, str):
-#         # If it's a single text, tokenize and process it
-#         inputs = tokenizer(text_input, return_tensors="pt",
-#                            padding=True, truncation=True, max_length=512)
-#     elif isinstance(text_input, dict):
-#         # If it's a dictionary, tokenize and process each text
-#         inputs = tokenizer(list(text_input.values()), return_tensors="pt",
-#                            padding=True, truncation=True, max_length=512)
-#     else:
-#         raise ValueError(
-#             "Unsupported input type. Please provide a single text or a dictionary of texts.")
-
-#     # Forward pass through the BERT model
-#     with torch.no_grad():
-#         outputs = model(**inputs)
-
-#     # Extract the embeddings from the last layer (CLS token)
-#     embeddings = outputs.last_hidden_state.mean(dim=1).numpy()
-
-#     if isinstance(text_input, str):
-#         # Return a list instead of an array for a single text
-#         return embeddings[0].tolist()
-#     elif isinstance(text_input, dict):
-#         # Store the embeddings in the dictionary
-#         embeddings_dict = {key: embedding.tolist()
-#                            for key, embedding in zip(text_input.keys(), embeddings)}
-#         return embeddings_dict

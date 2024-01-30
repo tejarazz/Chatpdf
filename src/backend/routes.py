@@ -4,6 +4,7 @@ from modules.fileprocess import fileprocess, save_conversation, store_chat_info,
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import tiktoken
 from utilities import getResponseFromMessages
 import json
 
@@ -186,21 +187,48 @@ def ask_question(chat_id):
 
         embs = [get_embeddings_of_doc(doc_name)[1] for doc_name in doc_names]
 
-        print(get_embeddings_of_doc(doc_names[0])[1]['embeddings_json']["0"])
+        # print(get_embeddings_of_doc(doc_names[0])[1]['embeddings_json']["0"])
         # Find the similarities of each embedding chunk with the question.Also find the top similar chunks.
 
-        similarity = [get_similar_chunks(
+        similar_doc_texts = [get_similar_chunks(
             data_, question_text) for data_ in embs]
-        print(similarity)
+        combined_text = "\n".join(
+            [value for dictionary in similar_doc_texts for value in dictionary.values()])
+        # print(combined_text)
 
-        # TODO: design a prompt that takes the top similar chunks and asks the question to LLM.
+        def get_token_count(combined_text):
+            # Tokenizing the text
+            encoding = tiktoken.get_encoding("cl100k_base")
+            token_count = len(encoding.encode(combined_text))
+            return token_count
+
+        print(get_token_count(combined_text))
+
+        # Design a prompt that takes the top similar chunks and asks the question to LLM.
+
+        question_prompt = f'''
+You are a question answering specialist. Using the SOURCE TEXT provided in triple backticks, answer the QUESTION provided in triple backticks.
+
+SOURCE TEXT: ```{combined_text}```
+
+QUESTION: ```{question_text}```
+
+ANSWER:
+'''
+
         messages = data['conversation']
+        messages_q = data['conversation'].copy()
         q = {
             "role": "user",
             "content": question_text
         }
+        q_prompt = {
+            "role": "user",
+            "content": question_prompt
+        }
         messages.append(q)
-        response = getResponseFromMessages(messages)
+        messages_q.append(q_prompt)
+        response = getResponseFromMessages(messages_q)
 
         a = {
             "content": response,
