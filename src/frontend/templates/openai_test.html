@@ -321,7 +321,7 @@ content %}
             // Split content into lines and remove backticks
             var lines = content.split('\n').map(line => line.replace(/`/g, ''));
             var formattedContent = lines.join('<br>');
-            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><p class="font-bold">${point.role}:</p> ${formattedContent}</div>`;
+            return `<div class="border rounded-md p-2 border-gray-300 bg-gray-100"><p class="font-bold">${point.role}:</p> ${formattedContent}</div>`;
           }
         }).join("");
 
@@ -542,7 +542,7 @@ content %}
           // Split content into lines and remove backticks
           var lines = content.split('\n').map(line => line.replace(/`/g, ''));
           var formattedContent = lines.join('<br>');
-          return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><p class="font-bold">${point.role}:</p> ${formattedContent}</div>`;
+          return `<div class="border rounded-md p-2 border-gray-300 bg-gray-100"><p class="font-bold">${point.role}:</p> ${formattedContent}</div>`;
         }
       }).join("");
 
