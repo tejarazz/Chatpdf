@@ -202,7 +202,7 @@ def ask_question(chat_id):
             token_count = len(encoding.encode(combined_text))
             return token_count
 
-        print(get_token_count(combined_text))
+        print("Tokens consumed :", get_token_count(combined_text))
 
         # Design a prompt that takes the top similar chunks and asks the question to LLM.
 

@@ -766,7 +766,7 @@ content %}
     chatsToDisplay.forEach(chat => {
       const chatContainer = document.createElement('div');
       chatContainer.classList.add(
-        'flex', 'flex-col', 'bg-white', 'rounded', 'w-full', 'h-16',
+        'flex', 'flex-col', 'bg-white', 'rounded', 'w-full', 'h-12',
         'relative', 'shadow-md', 'my-2'
       );
 
@@ -792,7 +792,7 @@ content %}
       accessButton.classList.add(
         'bg-white', 'text-black', 'text-xs', 'font-medium', 'rounded',
         'text-xs', 'cursor-pointer', 'text-left', 'pl-4',
-        'focus:outline-none', 'hover:bg-gray-200', 'w-full', 'h-16'
+        'focus:outline-none', 'hover:bg-gray-200', 'w-full', 'h-12'
       );
       accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
 
@@ -800,7 +800,7 @@ content %}
       const moreOptionsButton = document.createElement('button');
       moreOptionsButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
       moreOptionsButton.classList.add(
-        'absolute', 'top-4', 'right-1', 'text-black',
+        'absolute', 'top-2', 'right-1', 'text-black',
         'rounded-full', 'px-3', 'py-2', 'text-xs', 'cursor-pointer', 'focus:outline-none', 'hover:text-gray-400'
       );
 
