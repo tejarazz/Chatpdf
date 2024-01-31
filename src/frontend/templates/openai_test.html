@@ -304,7 +304,9 @@ content %}
         console.log("Server Response:", response);
 
         var partconv = response.conversation;
-
+        var chatTitle = document.getElementById("chatTitle");
+        chatTitle.innerHTML = removeTrailingDot(response.chat_name) || "Chat Title";
+        chatTitle.classList.add('text-sm');
         var conversationHTML = partconv.map((point) => {
           var content = point.content;
 
@@ -319,9 +321,17 @@ content %}
             return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre>${Prism.highlight(codeContent, Prism.languages.auto, 'auto')}</pre></div>`;
           } else {
             // Split content into lines and remove backticks
-            var lines = content.split('\n').map(line => line.replace(/`/g, ''));
+            var lines = content.split('\n').map(line => {
+              var parts = line.split(':');
+              if (parts.length > 1) {
+                parts[0] = `<span class="font-semibold text-md">${parts[0]}</span>`;
+              }
+              return parts.join(':').replace(/`/g, '');
+            });
+
             var formattedContent = lines.join('<br>');
-            return `<div class="border rounded-md p-2 border-gray-300 bg-gray-100"><p class="font-bold">${point.role}:</p> ${formattedContent}</div>`;
+
+            return `<div class="border rounded-sm p-2 border-gray-300 bg-gray-100"><p class="font-bold text-md">${point.role}:</p> ${formattedContent}</div>`;
           }
         }).join("");
 
@@ -540,9 +550,17 @@ content %}
           return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre>${Prism.highlight(codeContent, Prism.languages.auto, 'auto')}</pre></div>`;
         } else {
           // Split content into lines and remove backticks
-          var lines = content.split('\n').map(line => line.replace(/`/g, ''));
+          var lines = content.split('\n').map(line => {
+            var parts = line.split(':');
+            if (parts.length > 1) {
+              parts[0] = `<span class="font-semibold text-md">${parts[0]}</span>`;
+            }
+            return parts.join(':').replace(/`/g, '');
+          });
+
           var formattedContent = lines.join('<br>');
-          return `<div class="border rounded-md p-2 border-gray-300 bg-gray-100"><p class="font-bold">${point.role}:</p> ${formattedContent}</div>`;
+
+          return `<div class="border rounded-sm p-2 border-gray-300 bg-gray-100"><p class="font-bold text-md">${point.role}:</p> ${formattedContent}</div>`;
         }
       }).join("");
 
@@ -766,8 +784,8 @@ content %}
     chatsToDisplay.forEach(chat => {
       const chatContainer = document.createElement('div');
       chatContainer.classList.add(
-        'flex', 'flex-col', 'bg-white', 'rounded', 'w-full', 'h-12',
-        'relative', 'shadow-md', 'my-2'
+        'flex', 'flex-col', 'bg-transparent', 'rounded', 'w-full', 'h-10',
+        'relative', 'my-2'
       );
 
       const chatNameWithoutDot = chat.chat_name.endsWith('.') ? chat.chat_name.slice(0, -1) : chat.chat_name;
@@ -790,9 +808,9 @@ content %}
 
       // Add button styles
       accessButton.classList.add(
-        'bg-white', 'text-black', 'text-xs', 'font-medium', 'rounded',
-        'text-xs', 'cursor-pointer', 'text-left', 'pl-4',
-        'focus:outline-none', 'hover:bg-gray-200', 'w-full', 'h-12'
+        'bg-transparent', 'text-white', 'text-xs', 'font-medium', 'rounded',
+        'text-xs', 'cursor-pointer', 'text-left', 'pl-2',
+        'focus:outline-none', 'hover:bg-blue-700', 'w-full', 'h-10'
       );
       accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
 
@@ -800,14 +818,14 @@ content %}
       const moreOptionsButton = document.createElement('button');
       moreOptionsButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
       moreOptionsButton.classList.add(
-        'absolute', 'top-2', 'right-1', 'text-black',
+        'absolute', 'top-1', 'right-1', 'text-white',
         'rounded-full', 'px-3', 'py-2', 'text-xs', 'cursor-pointer', 'focus:outline-none', 'hover:text-gray-400'
       );
 
       // Create the options dropdown
       const optionsDropdown = document.createElement('div');
       optionsDropdown.classList.add(
-        'hidden', 'absolute', 'right-0', 'top-11', 'bg-gray-900', 'border',
+        'hidden', 'absolute', 'right-0', 'top-11', 'bg-gray-900',
         'rounded-md', 'z-10', 'text-sm', 'options-dropdown' // Added a class for easier selection
       );
 

@@ -206,20 +206,35 @@ def get_embeddings_of_doc(doc_name):
 # Find similar chunks from document
 
 def get_similar_chunks(data, question):
-
     try:
         question_emb = get_embeddings_of_text(question)
-        # print("Keys in embeddings_json:", data['embeddings_json'].keys())
+
+        total_pages = len(data['embeddings_json'])
+        threshold = 0.4
+        threshold_reducing_factor = 0.9
+
         emb_similarity_scores = {page_no: cosine_similarity(
             question_emb, data['embeddings_json'][page_no]) for page_no in data['embeddings_json'].keys()}
-        # Filter pages with similarity scores above or equal to the threshold
-        relevant_page_nos = [page_no for page_no,
-                             score in emb_similarity_scores.items() if score >= 0.4]
-        print(emb_similarity_scores)
-        print(relevant_page_nos)
-        relevant_page_texts = {page_no: text for page_no,
-                               text in data['text_json'].items() if page_no in relevant_page_nos}
-        return relevant_page_texts
+
+        def getRelevantPageNos(x): return [
+            page_no for page_no, score in x.items() if score >= threshold]
+
+        relevant_page_nos = getRelevantPageNos(emb_similarity_scores)
+
+        if len(emb_similarity_scores.keys()) < 5:
+            relevant_page_nos = list(emb_similarity_scores.keys())
+
+        while (len(relevant_page_nos) < 5) and (len(emb_similarity_scores.keys()) >= 5):
+            threshold *= threshold_reducing_factor
+            # Filter pages with similarity scores above or equal to the threshold
+            relevant_page_nos = getRelevantPageNos(emb_similarity_scores)
+
+        page_data = [{'page_no': page_no, 'text': text, 'score': emb_similarity_scores[page_no]}
+                     for page_no, text in data['text_json'].items() if page_no in relevant_page_nos]
+
+        print("pages", relevant_page_nos)
+
+        return page_data
 
     except Exception as e:
         # Handle other potential errors and return False and an error message

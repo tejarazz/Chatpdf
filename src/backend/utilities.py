@@ -7,6 +7,7 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from typing import List
 import openai
 import os
+import tiktoken
 
 openai.api_key = os.environ.get("OPENAI_API")
 
@@ -19,7 +20,6 @@ def getResponseFromMessages(messages):
         model="gpt-3.5-turbo", messages=messages)
 #     print(chat_completion)
     bot_response = chat_completion.choices[0].message.content
-    print(bot_response)
     return bot_response
 
 
@@ -213,3 +213,32 @@ def cosine_similarity(embedding1, embedding2):
 
     similarity = dot_product / (norm_embedding1 * norm_embedding2)
     return similarity
+
+
+def get_token_count(text):
+    # Tokenizing the text
+    encoding = tiktoken.get_encoding("cl100k_base")
+    token_count = len(encoding.encode(text))
+    return token_count
+
+
+def select_messages_within_token_limit(messages, max_token_count=1300):
+    current_token_count = 0
+    selected_messages = []
+
+    for message in reversed(messages):
+        role = message["role"]
+        content = message["content"]
+
+        # Calculate token count for the current message
+        message_token_count = get_token_count(content)
+
+        # Check if adding the current message exceeds the maximum token count
+        if current_token_count + message_token_count <= max_token_count:
+            # Insert at the beginning to maintain order
+            selected_messages.insert(0, message)
+            current_token_count += message_token_count
+        else:
+            break  # Stop adding messages once the maximum token count is reached
+
+    return selected_messages, current_token_count

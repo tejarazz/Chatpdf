@@ -5,7 +5,7 @@ from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import tiktoken
-from utilities import getResponseFromMessages
+from utilities import getResponseFromMessages, get_token_count, select_messages_within_token_limit
 import json
 
 
@@ -190,17 +190,22 @@ def ask_question(chat_id):
         # print(get_embeddings_of_doc(doc_names[0])[1]['embeddings_json']["0"])
         # Find the similarities of each embedding chunk with the question.Also find the top similar chunks.
 
-        similar_doc_texts = [get_similar_chunks(
+        page_data_docs = [get_similar_chunks(
             data_, question_text) for data_ in embs]
-        combined_text = "\n".join(
-            [value for dictionary in similar_doc_texts for value in dictionary.values()])
-        # print(combined_text)
+        top_page_data_list = [
+            page_data for page_data_list in page_data_docs for page_data in page_data_list]
 
-        def get_token_count(combined_text):
-            # Tokenizing the text
-            encoding = tiktoken.get_encoding("cl100k_base")
-            token_count = len(encoding.encode(combined_text))
-            return token_count
+        top_page_data_list_sorted = sorted(
+            top_page_data_list, key=lambda x: x['score'])[::-1]
+        print([x['score'] for x in top_page_data_list_sorted])
+        combined_text = ''
+        token_counter_page_data = 0
+        max_page_data_tokens = 1600
+        for page_data in top_page_data_list_sorted:
+            token_counter_page_data += get_token_count(page_data['text'])
+            if token_counter_page_data <= max_page_data_tokens:
+                combined_text += page_data['text']
+                print(page_data['page_no'], page_data['score'])
 
         print("Tokens consumed :", get_token_count(combined_text))
 
@@ -218,6 +223,9 @@ ANSWER:
 
         messages = data['conversation']
         messages_q = data['conversation'].copy()
+
+        selected_messages, current_token_count = select_messages_within_token_limit(
+            messages_q)
         q = {
             "role": "user",
             "content": question_text
@@ -227,8 +235,8 @@ ANSWER:
             "content": question_prompt
         }
         messages.append(q)
-        messages_q.append(q_prompt)
-        response = getResponseFromMessages(messages_q)
+        selected_messages.append(q_prompt)
+        response = getResponseFromMessages(selected_messages)
 
         a = {
             "content": response,
@@ -268,7 +276,7 @@ A compilation of Greek, Roman, and Norse mythology, providing a comprehensive ov
             messages_dum.append(q)
             chat_name = getResponseFromMessages(messages_dum)
         save_conversation(messages, chat_id, chat_name)
-        return jsonify({"conversation": part_conv})
+        return jsonify({"conversation": part_conv, "chat_name": chat_name})
 
     except Exception as e:
         print(f"Error in ask_question route: {str(e)}")
