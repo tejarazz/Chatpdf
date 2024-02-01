@@ -35,7 +35,7 @@ def save_conversation(conversation, chat_id, chat_name=None):
         chat_query = ", chat_name = %s" if chat_name else ""
 
         # Correctly format the update_chat_query string
-        update_chat_query = f'''UPDATE pdfchat.chat_info
+        update_chat_query = f'''UPDATE pdfchat.Chat_info
 SET conversation = %s{chat_query} WHERE chat_id = %s
         '''
 
