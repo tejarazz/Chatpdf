@@ -1,5 +1,4 @@
-import mysql.connector
-from mysql.connector import Error
+import os
 
 
 class Config:
@@ -12,4 +11,4 @@ class Config:
     MYSQL_DB = 'PDFCHAT'
 
     # App
-    UPLOAD_FOLDER = '/tmp/'
+    UPLOAD_FOLDER = os.getenv('PDF_FILE_UPLOAD_DIR', 'D://uploads')
