@@ -1,45 +1,26 @@
+from numpy.linalg import norm
+import numpy as np
 import fitz  # PyMuPDF
 import mysql.connector
-import pickle
 from config import Config
-from transformers import AutoTokenizer, AutoModel
-import torch
+from langchain.embeddings import HuggingFaceEmbeddings
+from typing import List
 import openai
 import os
+import tiktoken
 
 openai.api_key = os.environ.get("OPENAI_API")
 
 # Modules
 
 
-def getResponseFromMessages(messages, query):
+def getResponseFromMessages(messages):
 
     chat_completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo", messages=messages)
 #     print(chat_completion)
     bot_response = chat_completion.choices[0].message.content
-    print(bot_response)
     return bot_response
-
-
-def write_to_pickle(data, file_path):
-    try:
-        with open(file_path, 'wb') as file:
-            pickle.dump(data, file)
-        print("Data successfully written to pickle file:", file_path)
-    except Exception as e:
-        print("Error writing data to pickle file:", e)
-
-
-def read_from_pickle(file_path):
-    try:
-        with open(file_path, 'rb') as file:
-            data = pickle.load(file)
-        print("Data successfully read from pickle file:", file_path)
-        return data
-    except Exception as e:
-        print("Error reading data from pickle file:", e)
-        return None
 
 
 def getSQLConnection():
@@ -164,60 +145,100 @@ def read_pdf(file_path):
     return output
 
 
-def get_text_embeddings(text_dict):
+def get_text_embeddings(text_dict: dict) -> dict:
+    """
+    Get embeddings for a dictionary of text using HuggingFaceEmbeddings.
 
-    # Load pre-trained BERT tokenizer and model
-    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-    model = AutoModel.from_pretrained("bert-base-uncased")
+    Parameters:
+    - text_dict: dict, a dictionary where keys are document names and values are text content
 
-    # Tokenize all input texts
-    inputs = tokenizer(list(text_dict.values()), return_tensors="pt",
-                       padding=True, truncation=True, max_length=512)
+    Returns:
+    - embeddings_dict: dict, a dictionary where keys are document names and values are embeddings
+    """
+    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_kwargs = {'device': 'cpu'}
+    encode_kwargs = {'normalize_embeddings': False}
+    hf = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
+    )
 
-    # Forward pass through the BERT model
-    with torch.no_grad():
-        outputs = model(**inputs)
+    texts = list(text_dict.values())
+    embeddings = hf.embed_documents(texts)
 
-    # Extract the embeddings from the last layer (CLS token)
-    embeddings = outputs.last_hidden_state.mean(dim=1).numpy()
-
-    # Store the embeddings in the dictionary
-    embeddings_dict = {key: embedding.tolist() for key,
-                       embedding in zip(text_dict.keys(), embeddings)}
-
+    # Ensure that each embedding is converted to a list
+    embeddings_dict = {key: embedding if isinstance(embedding, list) else embedding.tolist()
+                       for key, embedding in zip(text_dict.keys(), embeddings)}
     return embeddings_dict
 
 
-# def get_q_text_embeddings(text_input):
-#     # Load pre-trained BERT tokenizer and model
-#     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-#     model = AutoModel.from_pretrained("bert-base-uncased")
+def get_embeddings_of_text(text: str) -> List[float]:
+    """
+    Get embeddings for a single text using HuggingFaceEmbeddings.
 
-#     # Check if the input is a single text or a dictionary of texts
-#     if isinstance(text_input, str):
-#         # If it's a single text, tokenize and process it
-#         inputs = tokenizer(text_input, return_tensors="pt",
-#                            padding=True, truncation=True, max_length=512)
-#     elif isinstance(text_input, dict):
-#         # If it's a dictionary, tokenize and process each text
-#         inputs = tokenizer(list(text_input.values()), return_tensors="pt",
-#                            padding=True, truncation=True, max_length=512)
-#     else:
-#         raise ValueError(
-#             "Unsupported input type. Please provide a single text or a dictionary of texts.")
+    Parameters:
+    - text: str, input text for which embeddings are needed
 
-#     # Forward pass through the BERT model
-#     with torch.no_grad():
-#         outputs = model(**inputs)
+    Returns:
+    - embeddings: List[float], embeddings for the input text
+    """
+    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_kwargs = {'device': 'cpu'}
+    encode_kwargs = {'normalize_embeddings': False}
+    hf = HuggingFaceEmbeddings(
+        model_name=model_name,
+        model_kwargs=model_kwargs,
+        encode_kwargs=encode_kwargs
+    )
 
-#     # Extract the embeddings from the last layer (CLS token)
-#     embeddings = outputs.last_hidden_state.mean(dim=1).numpy()
+    embedding = hf.embed_query(text)
+    return embedding
 
-#     if isinstance(text_input, str):
-#         # Return a list instead of an array for a single text
-#         return embeddings[0].tolist()
-#     elif isinstance(text_input, dict):
-#         # Store the embeddings in the dictionary
-#         embeddings_dict = {key: embedding.tolist()
-#                            for key, embedding in zip(text_input.keys(), embeddings)}
-#         return embeddings_dict
+
+def cosine_similarity(embedding1, embedding2):
+    """
+    Calculate cosine similarity between two embeddings.
+
+    Parameters:
+    - embedding1: numpy array, the first embedding vector
+    - embedding2: numpy array, the second embedding vector
+
+    Returns:
+    - similarity: float, cosine similarity between the two embeddings
+    """
+    dot_product = np.dot(embedding1, embedding2)
+    norm_embedding1 = norm(embedding1)
+    norm_embedding2 = norm(embedding2)
+
+    similarity = dot_product / (norm_embedding1 * norm_embedding2)
+    return similarity
+
+
+def get_token_count(text):
+    # Tokenizing the text
+    encoding = tiktoken.get_encoding("cl100k_base")
+    token_count = len(encoding.encode(text))
+    return token_count
+
+
+def select_messages_within_token_limit(messages, max_token_count=1300):
+    current_token_count = 0
+    selected_messages = []
+
+    for message in reversed(messages):
+        role = message["role"]
+        content = message["content"]
+
+        # Calculate token count for the current message
+        message_token_count = get_token_count(content)
+
+        # Check if adding the current message exceeds the maximum token count
+        if current_token_count + message_token_count <= max_token_count:
+            # Insert at the beginning to maintain order
+            selected_messages.insert(0, message)
+            current_token_count += message_token_count
+        else:
+            break  # Stop adding messages once the maximum token count is reached
+
+    return selected_messages, current_token_count

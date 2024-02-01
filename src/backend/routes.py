@@ -1,10 +1,11 @@
 import os
 from flask import Flask, request, jsonify
-from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list, del_chat, update_chatname, get_embeddings_of_doc, get_similar_chunks
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from utilities import getResponseFromMessages
+import tiktoken
+from utilities import getResponseFromMessages, get_token_count, select_messages_within_token_limit
 import json
 
 
@@ -61,7 +62,24 @@ def list_files():
 
 def list_all_chats():
     # Implement logic to list all chats
-    return jsonify({"chats": []})
+
+    try:
+        # Get the chat_id parameter from the query string
+        # chat_id = request.args.get('chat_id')
+
+        success, chat_data = load_chat_list()
+
+        # Check if chat_data retrieval was successful
+        if success:
+            # Return the chat data as JSON
+            return jsonify(chat_data)
+        else:
+            # If chat_id not found or other errors, return an error response
+            return jsonify({"error": chat_data["error"]}), 404 if "Chat not found" in chat_data["error"] else 500
+
+    except Exception as e:
+        # Handle other potential errors
+        return jsonify({"error": str(e)}), 500
 
 
 def create_chat():
@@ -98,8 +116,19 @@ def remove_document(chat_id):
 
 
 def delete_chat(chat_id):
-    # Implement logic to delete a chat
-    return jsonify({"message": "Chat deleted successfully"})
+    try:
+        # Call the del_chat function to delete the chat
+        success, result = del_chat(chat_id)
+
+        if success:
+            return jsonify(result)
+        else:
+            return jsonify(result), 404
+
+    except Exception as e:
+        # Handle other potential errors and return an error message
+        print("An exception occurred:", e)
+        return jsonify({"error": str(e)}), 500
 
 
 def load_chat(chat_id):
@@ -122,6 +151,26 @@ def load_chat(chat_id):
         return jsonify({"error": str(e)}), 500
 
 
+def update_chat_name():
+    try:
+        # Get parameters from the request (assuming JSON data is sent in the request body)
+        data = request.get_json()
+        chat_id = data.get('chat_id')
+        new_chat_name = data.get('new_chat_name')
+
+        # Call the function to update the chat name
+        success, result = update_chatname(chat_id, new_chat_name)
+
+        if success:
+            return jsonify(result)
+        else:
+            return jsonify({"error": result["error"]}), 500
+
+    except Exception as e:
+        # Handle other potential errors
+        return jsonify({"error": str(e)}), 500
+
+
 def ask_question(chat_id):
     try:
         question_text = request.form.get('question')
@@ -130,24 +179,104 @@ def ask_question(chat_id):
 
         user_id = 1
         status, data = load_chat_data(chat_id)
+        # Extract document name from the chat(data)
+
+        doc_names = data["documents"]
+
+        # Fetch the embeddings from the document name
+
+        embs = [get_embeddings_of_doc(doc_name)[1] for doc_name in doc_names]
+
+        # print(get_embeddings_of_doc(doc_names[0])[1]['embeddings_json']["0"])
+        # Find the similarities of each embedding chunk with the question.Also find the top similar chunks.
+
+        page_data_docs = [get_similar_chunks(
+            data_, question_text) for data_ in embs]
+        top_page_data_list = [
+            page_data for page_data_list in page_data_docs for page_data in page_data_list]
+
+        top_page_data_list_sorted = sorted(
+            top_page_data_list, key=lambda x: x['score'])[::-1]
+        print([x['score'] for x in top_page_data_list_sorted])
+        combined_text = ''
+        token_counter_page_data = 0
+        max_page_data_tokens = 1600
+        for page_data in top_page_data_list_sorted:
+            token_counter_page_data += get_token_count(page_data['text'])
+            if token_counter_page_data <= max_page_data_tokens:
+                combined_text += page_data['text']
+                print(page_data['page_no'], page_data['score'])
+
+        print("Tokens consumed :", get_token_count(combined_text))
+
+        # Design a prompt that takes the top similar chunks and asks the question to LLM.
+
+        question_prompt = f'''
+You are a question answering specialist. Using the SOURCE TEXT provided in triple backticks, answer the QUESTION provided in triple backticks.
+
+SOURCE TEXT: ```{combined_text}```
+
+QUESTION: ```{question_text}```
+
+ANSWER:
+'''
+
         messages = data['conversation']
+        messages_q = data['conversation'].copy()
+
+        selected_messages, current_token_count = select_messages_within_token_limit(
+            messages_q)
         q = {
             "role": "user",
             "content": question_text
         }
+        q_prompt = {
+            "role": "user",
+            "content": question_prompt
+        }
         messages.append(q)
-        response = getResponseFromMessages(messages, question_text)
+        selected_messages.append(q_prompt)
+        response = getResponseFromMessages(selected_messages)
 
         a = {
             "content": response,
             "role": "assistant"
         }
         messages.append(a)
-        save_conversation(messages, chat_id)
         part_conv = []
         part_conv.append(q)
         part_conv.append(a)
-        return jsonify({"conversation": part_conv})
+        chat_name = data["chat_name"]
+        if len(messages) <= 2:
+            messages_dum = []
+
+            # Multi-Shot Prompting
+            q = {
+                "role": "user",
+                "content": f'''Summarize the text provided in triple backticks in maximum 3 words. This will be used to recall this text using the summary generated. Take a hint from examples.
+                
+                EXAMPLE 1:
+                TEXT: Who is president of USA? I'm sorry, but I don't have real-time information. As of my last knowledge update in January 2022, Joe Biden was the President of the United States. Please verify with up-to-date sources to find the current President as my information might be outdated.
+                SUMMARY: Biden is US President.
+                
+                EXAMPLE 2:
+                TEXT: Suggest good books to read in myth? Certainly! Mythology is a rich and fascinating genre with a wide range of cultural and historical stories. Here are some excellent books in the realm of mythology:
+"The Hero with a Thousand Faces" by Joseph Campbell
+A classic exploration of the hero's journey and common mythological themes across cultures.
+"Norse Mythology" by Neil Gaiman
+Gaiman retells the classic Norse myths in his unique and engaging style.
+"Bulfinch's Mythology" by Thomas Bulfinch
+A compilation of Greek, Roman, and Norse mythology, providing a comprehensive overview.
+                SUMMARY:Mythology Book Recommendations
+                
+                Text:`{question_text}? {response}`
+                SUMMARY: '''
+            }
+
+            messages_dum.append(q)
+            chat_name = getResponseFromMessages(messages_dum)
+        save_conversation(messages, chat_id, chat_name)
+        return jsonify({"conversation": part_conv, "chat_name": chat_name})
 
     except Exception as e:
         print(f"Error in ask_question route: {str(e)}")

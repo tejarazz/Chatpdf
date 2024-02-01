@@ -8,11 +8,31 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Include SimpleBar stylesheet -->
+  <link rel="stylesheet" href="https://unpkg.com/simplebar@5.3.3/dist/simplebar.min.css">
+  <script src="https://unpkg.com/simplebar@5.3.4/dist/simplebar.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    crossorigin="anonymous" />
+
+
+
   <title>{% block title %}{% endblock %}</title>
+  <!-- Inline Tailwind classes for scrollbar styling -->
+  <style>
+    #chatListSection .simplebar-scrollbar {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    #chatListSection.group:hover .simplebar-scrollbar {
+      opacity: 1;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 font-sans">
-  <nav class="bg-blue-900 text-white">
+<body class="bg-blue-100 font-sans">
+  <nav class="bg-blue-800 text-white">
     <div class="container flex justify-start items-center h-auto px-4 md:px-0 mx-auto md:py-6 py-4">
       <a class="text-white md:text-3xl font-sans text-xl w-full text-center font-bold" href="/"
         style="text-decoration:none">Chat Bot</a>

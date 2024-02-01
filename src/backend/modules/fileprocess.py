@@ -1,4 +1,4 @@
-from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQuery, runSelectQuery
+from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQuery, runSelectQuery, runDeleteQuery, runUpdateQuery, cosine_similarity, get_embeddings_of_text
 import os
 import json
 
@@ -29,18 +29,28 @@ def fileprocess(file_path, user_id):
         return False
 
 
-def save_conversation(conversation, chat_id):
+def save_conversation(conversation, chat_id, chat_name=None):
     try:
-        insert_question_query = '''UPDATE pdfchat.chat_info
-SET conversation = %s where chat_id =%s
+        # Format the chat_query string using a ternary operator
+        chat_query = ", chat_name = %s" if chat_name else ""
+
+        # Correctly format the update_chat_query string
+        update_chat_query = f'''UPDATE pdfchat.chat_info
+SET conversation = %s{chat_query} WHERE chat_id = %s
         '''
+
         # Pass parameters as a tuple
-        runInsertQuery(insert_question_query,
-                       (json.dumps(conversation), chat_id))
+        if chat_name:
+            runInsertQuery(update_chat_query, (json.dumps(
+                conversation), chat_name, chat_id))
+        else:
+            runInsertQuery(update_chat_query,
+                           (json.dumps(conversation), chat_id))
+
         return True
 
     except Exception as e:
-        print("some error occured in save conversation", e)
+        print("Some error occurred in save conversation:", e)
         return False
 
 
@@ -98,4 +108,135 @@ def load_chat_data(chat_id):
     except Exception as e:
         # Handle other potential errors and return False and an error message
         print("some exception occured", e)
+        return False, {"error": str(e)}
+
+
+def load_chat_list():
+    try:
+        # Query the database to retrieve chat data based on chat_id
+        select_query = f'SELECT chat_id, chat_name FROM chat_info'
+        # values = (chat_id,)
+        chat_data = runSelectQuery(select_query)
+        print(chat_data)
+        # Check if the chat_id exists in the database
+        if chat_data:
+            # Convert the messages column from string to list
+            res = []
+            for rec_tup in chat_data:
+                rec = {
+
+                }
+                rec['chat_id'] = rec_tup[0]
+                rec['chat_name'] = rec_tup[1]
+                res.append(rec)
+            return True, res
+        else:
+            # If chat_id not found, return False and an error message
+            return False, {"error": "Chat not found"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("some exception occured", e)
+        return False, {"error": str(e)}
+
+
+def del_chat(chat_id):
+    try:
+        values = (chat_id,)
+        # Delete the chat with the specified chat_id
+        delete_query = 'DELETE FROM chat_info WHERE chat_id = %s'
+        runDeleteQuery(delete_query, values)
+        return True, {"message": "Chat deleted successfully"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
+        return False, {"error": str(e)}
+
+
+def rem_doc(chat_id):
+    try:
+        values = (chat_id,)
+        # Delete the chat with the specified chat_id
+        delete_query = 'DELETE FROM chat_info WHERE documents = %s'
+        runDeleteQuery(delete_query, values)
+        return True, {"message": "Document removed successfully"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
+        return False, {"error": str(e)}
+
+
+def update_chatname(chat_id, new_chat_name):
+    try:
+        values = (new_chat_name, chat_id)
+        # update the chat with the specified chat_id
+        update_query = 'UPDATE chat_info SET chat_name = %s WHERE chat_id = %s'
+        runUpdateQuery(update_query, values)
+        return True, {"message": "Chat name updated successfully"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
+        return False, {"error": str(e)}
+
+
+def get_embeddings_of_doc(doc_name):
+
+    try:
+        fetch_filedata_query = f"SELECT text_json , embeddings_json FROM file_data WHERE file_name ='{doc_name}'"
+        file_data = runSelectQuery(fetch_filedata_query)
+
+        data = {
+
+        }
+
+        data['text_json'] = json.loads(file_data[0][0])
+        data['embeddings_json'] = json.loads(file_data[0][1])
+
+        return True, data
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
+        return False, {"error": str(e)}
+
+
+# Find similar chunks from document
+
+def get_similar_chunks(data, question):
+    try:
+        question_emb = get_embeddings_of_text(question)
+
+        total_pages = len(data['embeddings_json'])
+        threshold = 0.4
+        threshold_reducing_factor = 0.9
+
+        emb_similarity_scores = {page_no: cosine_similarity(
+            question_emb, data['embeddings_json'][page_no]) for page_no in data['embeddings_json'].keys()}
+
+        def getRelevantPageNos(x): return [
+            page_no for page_no, score in x.items() if score >= threshold]
+
+        relevant_page_nos = getRelevantPageNos(emb_similarity_scores)
+
+        if len(emb_similarity_scores.keys()) < 5:
+            relevant_page_nos = list(emb_similarity_scores.keys())
+
+        while (len(relevant_page_nos) < 5) and (len(emb_similarity_scores.keys()) >= 5):
+            threshold *= threshold_reducing_factor
+            # Filter pages with similarity scores above or equal to the threshold
+            relevant_page_nos = getRelevantPageNos(emb_similarity_scores)
+
+        page_data = [{'page_no': page_no, 'text': text, 'score': emb_similarity_scores[page_no]}
+                     for page_no, text in data['text_json'].items() if page_no in relevant_page_nos]
+
+        print("pages", relevant_page_nos)
+
+        return page_data
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("An exception occurred:", e)
         return False, {"error": str(e)}
