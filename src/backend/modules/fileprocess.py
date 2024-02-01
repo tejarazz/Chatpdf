@@ -75,7 +75,7 @@ def store_chat_info(documents, user_id):
 
     except Exception as e:
         print(f'Error in store_chat_info: {e}')
-        return False
+        return 1
 
 
 def load_chat_data(chat_id):
