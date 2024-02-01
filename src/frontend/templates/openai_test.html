@@ -3,7 +3,7 @@ content %}
 <!-- Main Section -->
 <div class="main-section flex flex-col md:flex-row h-full">
   <!-- Section 1: Categories -->
-  <div class="section1 flex flex-col md:w-2/12 h-full pt-12">
+  <div class="section1 flex flex-col md:w-2/12 h-full pt-8">
     <h6 id="chatTitle"
       class="flex justify-center m-4 mt-2 p-2 font-medium text-sm bg-blue-800 text-white rounded-md h-12 overflow-hidden">
       Chat Title
@@ -16,7 +16,7 @@ content %}
   </div>
 
   <!-- Section 2: Chat Area -->
-  <div class="section-2 w-full md:w-8/12 h-3/4 mt-14 mx-2 p-6 bg-white rounded-lg shadow-lg">
+  <div class="section-2 w-full md:w-8/12 h-full mt-10 mx-2 p-6 bg-white rounded-lg shadow-lg">
     <div class="h-96" id="scrollContainer">
       <!-- Answer Container -->
       <div id="answerContainer" class="p-4 m-1 bg-white rounded-lg">
@@ -52,7 +52,7 @@ content %}
   </div>
 
   <!-- Section 3: File and Chat List -->
-  <div class="section3 flex flex-col md:w-2/12 pt-12 h-full">
+  <div class="section3 flex flex-col md:w-2/12 pt-8 h-full">
     <!-- Chat List -->
     <div class="flex flex-col m-4 mt-2 h-40 border border-black text-white rounded-md bg-blue-800">
       <h6 class="flex font-bold justify-center">Chat with</h6>
@@ -777,7 +777,7 @@ content %}
     chatListSection.classList.add('overflow-auto');
 
     const reversedChats = chats.slice().reverse();
-    const chatsToDisplay = reversedChats.slice(1);
+    const chatsToDisplay = reversedChats.slice();
 
     document.addEventListener('click', closeOptionsDropdown);
 
@@ -797,7 +797,7 @@ content %}
 
       // Create an inner container for the text
       const textContainer = document.createElement('div');
-      textContainer.textContent = chatNameWithoutDot;
+      textContainer.innerHTML = chatNameWithoutDot;
       textContainer.style.maxWidth = '80%';
       textContainer.style.overflow = 'hidden';
       textContainer.style.whiteSpace = 'nowrap';
