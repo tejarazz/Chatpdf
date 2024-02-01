@@ -12,4 +12,4 @@ class Config:
     MYSQL_DB = 'PDFCHAT'
 
     # App
-    UPLOAD_FOLDER = 'D:/uploads'
+    UPLOAD_FOLDER = '/tmp/'
