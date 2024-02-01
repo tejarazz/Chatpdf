@@ -287,7 +287,7 @@ content %}
     arrowIcon.style.visibility = "hidden";
     submitButton.style.cursor = "default";
 
-    fetch(`http://127.0.0.1:5000/ask-question/${chatId}`, {
+    fetch(`http://20.197.52.62/backend/ask-question/${chatId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -375,7 +375,7 @@ content %}
         uploadSpinner.style.opacity = "1";
 
         // Use fetch API to upload files to the server
-        const response = await fetch("http://127.0.0.1:5000/file-upload", {
+        const response = await fetch("http://20.197.52.62/backend/file-upload", {
           method: "POST",
           body: formData,
         });
@@ -402,7 +402,7 @@ content %}
   // Function to asynchronously fetch the list of files from the server
   async function fetchFileList() {
     try {
-      const response = await fetch("http://127.0.0.1:5000/list-files", {
+      const response = await fetch("http://20.197.52.62/backend/list-files", {
         method: "GET",
       });
 
@@ -585,7 +585,7 @@ content %}
     }
 
     // Make a GET request to the server to fetch chat data and PDF list based on chat_id
-    fetch(`http://127.0.0.1:5000/load-chat/${chatId}`)
+    fetch(`http://20.197.52.62/backend/load-chat/${chatId}`)
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -651,7 +651,7 @@ content %}
     };
 
     // Make a POST request to the server
-    fetch("http://127.0.0.1:5000/create-chat", {
+    fetch("http://20.197.52.62/backend/create-chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -735,7 +735,7 @@ content %}
 
   async function get_chat_list() {
     try {
-      const response = await fetch('http://127.0.0.1:5000/list-all-chats');
+      const response = await fetch('http://20.197.52.62/backend/list-all-chats');
       const data = await response.json();
 
       if (response.ok) {
@@ -755,7 +755,7 @@ content %}
 
   async function removeChat(chat_id, chatContainer) {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/delete-chat/${chat_id}`, {
+      const response = await fetch(`http://20.197.52.62/backend/delete-chat/${chat_id}`, {
         method: 'DELETE',
       });
 
@@ -948,7 +948,7 @@ content %}
 
   // Function to update chat name
   function updateChatName(chatId, newChatName) {
-    fetch('http://127.0.0.1:5000/update_chatname', {
+    fetch('http://20.197.52.62/backend/update_chatname', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
