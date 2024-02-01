@@ -15,7 +15,7 @@ def fileprocess(file_path, user_id):
         ######
 
         insert_file_entry_query = '''
-            INSERT INTO file_data (file_name, text_json, embeddings_json, user_id)
+            INSERT INTO PDFCHAT.file_data (file_name, text_json, embeddings_json, user_id)
             VALUES (%s, %s, %s, %s)
         '''
 
@@ -35,7 +35,7 @@ def save_conversation(conversation, chat_id, chat_name=None):
         chat_query = ", chat_name = %s" if chat_name else ""
 
         # Correctly format the update_chat_query string
-        update_chat_query = f'''UPDATE pdfchat.Chat_info
+        update_chat_query = f'''UPDATE PDFCHAT.Chat_info
 SET conversation = %s{chat_query} WHERE chat_id = %s
         '''
 
@@ -56,7 +56,7 @@ SET conversation = %s{chat_query} WHERE chat_id = %s
 
 def store_chat_info(documents, user_id):
     try:
-        select_query = '''select max(chat_id) from chat_info'''
+        select_query = '''select max(chat_id) from PDFCHAT.Chat_info'''
         result = runSelectQuery(select_query)
         last_chat_id = result[0][0]
         if last_chat_id:
@@ -65,7 +65,7 @@ def store_chat_info(documents, user_id):
             chat_id = 0
         # Insert chat information without fetching results
         insert_query = '''
-            INSERT INTO Chat_info (chat_id, chat_name, user_id, documents, conversation)
+            INSERT INTO PDFCHAT.Chat_info (chat_id, chat_name, user_id, documents, conversation)
             VALUES (%s,%s, %s, %s, %s)
         '''
         values = (chat_id, '', user_id, json.dumps(documents), None)
@@ -81,7 +81,7 @@ def store_chat_info(documents, user_id):
 def load_chat_data(chat_id):
     try:
         # Query the database to retrieve chat data based on chat_id
-        select_query = f'SELECT * FROM chat_info WHERE chat_id = {chat_id}'
+        select_query = f'SELECT * FROM PDFCHAT.Chat_info WHERE chat_id = {chat_id}'
         # values = (chat_id,)
         chat_data = runSelectQuery(select_query)
         print(chat_data)
@@ -114,7 +114,7 @@ def load_chat_data(chat_id):
 def load_chat_list():
     try:
         # Query the database to retrieve chat data based on chat_id
-        select_query = f'SELECT chat_id, chat_name FROM chat_info'
+        select_query = f'SELECT chat_id, chat_name FROM PDFCHAT.Chat_info'
         # values = (chat_id,)
         chat_data = runSelectQuery(select_query)
         print(chat_data)
@@ -144,7 +144,7 @@ def del_chat(chat_id):
     try:
         values = (chat_id,)
         # Delete the chat with the specified chat_id
-        delete_query = 'DELETE FROM chat_info WHERE chat_id = %s'
+        delete_query = 'DELETE FROM PDFCHAT.Chat_info WHERE chat_id = %s'
         runDeleteQuery(delete_query, values)
         return True, {"message": "Chat deleted successfully"}
 
@@ -158,7 +158,7 @@ def rem_doc(chat_id):
     try:
         values = (chat_id,)
         # Delete the chat with the specified chat_id
-        delete_query = 'DELETE FROM chat_info WHERE documents = %s'
+        delete_query = 'DELETE FROM PDFCHAT.Chat_info WHERE documents = %s'
         runDeleteQuery(delete_query, values)
         return True, {"message": "Document removed successfully"}
 
@@ -172,7 +172,7 @@ def update_chatname(chat_id, new_chat_name):
     try:
         values = (new_chat_name, chat_id)
         # update the chat with the specified chat_id
-        update_query = 'UPDATE chat_info SET chat_name = %s WHERE chat_id = %s'
+        update_query = 'UPDATE PDFCHAT.Chat_info SET chat_name = %s WHERE chat_id = %s'
         runUpdateQuery(update_query, values)
         return True, {"message": "Chat name updated successfully"}
 
@@ -185,7 +185,7 @@ def update_chatname(chat_id, new_chat_name):
 def get_embeddings_of_doc(doc_name):
 
     try:
-        fetch_filedata_query = f"SELECT text_json , embeddings_json FROM file_data WHERE file_name ='{doc_name}'"
+        fetch_filedata_query = f"SELECT text_json , embeddings_json FROM PDFCHAT.file_data WHERE file_name ='{doc_name}'"
         file_data = runSelectQuery(fetch_filedata_query)
 
         data = {
