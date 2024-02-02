@@ -278,10 +278,12 @@ content %}
     var answerContainer = document.getElementById("answerContainer");
     var answerContent = document.getElementById("answerContent");
     var scrollContainer = document.getElementById("scrollContainer");
-
+    // const chatListSection = document.getElementById('chatListSection');
+    // console.log(chatListSection);
     const urlParams = new URLSearchParams(window.location.search);
     const chatId = urlParams.get("chat_id");
-
+    var chat_name_entity = document.getElementById(`chat_container_${chatId}`);
+    console.log(chat_name_entity);
     if (!chatId) {
       Swal.fire({
         icon: 'warning',
@@ -322,6 +324,9 @@ content %}
 
         var partconv = response.conversation;
         var chatTitle = document.getElementById("chatTitle");
+
+        const nameDiv = chat_name_entity.querySelector('.relative > button > div');
+        nameDiv.textContent = response.chat_name;
         chatTitle.innerHTML = removeTrailingDot(response.chat_name) || "Chat Title";
         chatTitle.classList.add('text-xs');
         var conversationHTML = partconv.map((point) => {
@@ -791,6 +796,145 @@ content %}
     }
   }
 
+  function prepareChatNameEntity(chat, chatContainer) {
+    chatContainer.classList.add(
+      'flex', 'flex-col', 'bg-transparent', 'rounded', 'w-full', 'h-10',
+      'relative', 'my-2'
+    );
+
+    const chatNameWithoutDot = chat.chat_name.endsWith('.') ? chat.chat_name.slice(0, -1) : chat.chat_name;
+
+    const chatButtonContainer = document.createElement('div');
+    chatButtonContainer.classList.add('relative');
+
+    const accessButton = document.createElement('button');
+
+    // Create an inner container for the text
+    const textContainer = document.createElement('div');
+    textContainer.innerHTML = chatNameWithoutDot;
+    textContainer.style.maxWidth = '80%';
+    textContainer.style.overflow = 'hidden';
+    textContainer.style.whiteSpace = 'nowrap';
+    textContainer.style.textOverflow = 'hidden';
+
+    // Add text container to the button
+    accessButton.appendChild(textContainer);
+
+    // Add button styles
+    accessButton.classList.add(
+      'bg-transparent', 'text-white', 'text-xs', 'font-medium', 'rounded',
+      'text-xs', 'cursor-pointer', 'text-left', 'pl-2',
+      'focus:outline-none', 'hover:bg-purple-700', 'w-full', 'h-10'
+    );
+    accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
+
+    // Create the "More Options" button
+    const moreOptionsButton = document.createElement('button');
+    moreOptionsButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
+    moreOptionsButton.classList.add(
+      'absolute', 'top-1', 'right-1', 'text-white',
+      'rounded-full', 'px-3', 'py-2', 'text-xs', 'cursor-pointer', 'focus:outline-none', 'hover:text-gray-400'
+    );
+
+    // Create the options dropdown
+    const optionsDropdown = document.createElement('div');
+    optionsDropdown.classList.add(
+      'hidden', 'absolute', 'right-0', 'top-11', 'bg-gray-900',
+      'rounded-md', 'z-10', 'text-sm', 'options-dropdown' // Added a class for easier selection
+    );
+
+    // Create the "Delete Chat" option
+    const deleteOption = document.createElement('div');
+    deleteOption.innerHTML = '<i class="fas fa-trash"></i><span class="ml-2">Delete Chat</span>';
+    deleteOption.classList.add('py-3', 'px-6', 'text-red-600', 'rounded-md', 'cursor-pointer', 'text-xs', 'hover:bg-gray-800');
+    deleteOption.addEventListener('click', function (event) {
+      event.stopPropagation();
+      removeChat(chat.chat_id, chatContainer);
+    });
+
+    // Create the "Rename" option
+    const renameOption = document.createElement('div');
+    renameOption.innerHTML = '<i class="fas fa-edit"></i><span class="ml-2">Rename</span>';
+    renameOption.classList.add('py-3', 'px-6', 'cursor-pointer', 'rounded-md', 'text-xs', 'hover:bg-gray-800', 'flex', 'items-center');
+    renameOption.addEventListener('click', function (event) {
+      event.stopPropagation();
+
+      // Create an input element
+      const inputElement = document.createElement('input');
+      inputElement.type = 'text';
+      inputElement.value = chat.chat_name;
+      inputElement.classList.add('border', 'border-gray-300', 'p-1', 'text-black', 'rounded-sm');
+
+      // Replace the accessButton content with the input element
+      accessButton.innerHTML = '';
+      accessButton.appendChild(inputElement);
+
+      // Focus on the input element
+      inputElement.focus();
+
+      // Listen for blur event on input element
+      inputElement.addEventListener('blur', async function () {
+        const newChatName = inputElement.value.trim();
+
+        try {
+          // Call the updateChatName function asynchronously to update the database
+          await updateChatName(chat.chat_id, newChatName);
+
+          // If the user didn't change the name, restore the original chat name
+          if (!newChatName) {
+            inputElement.value = chat.chat_name;
+          } else {
+            // Update the global chat variable with the new name
+            chat.chat_name = newChatName;
+          }
+        } catch (error) {
+          console.error('Error updating chat name:', error);
+          // Handle the error appropriately (e.g., display an error message to the user)
+        } finally {
+          // Remove the input element and restore the original content
+          accessButton.innerHTML = chat.chat_name;
+        }
+      });
+
+      // Listen for keydown event on input element
+      inputElement.addEventListener('keydown', function (event) {
+        // Prevent default action for spacebar key
+        if (event.key === ' ' || event.code === 'Space') {
+          event.preventDefault();
+
+          // Add a space to the input
+          inputElement.value += ' ';
+        }
+
+        // If Enter key is pressed, blur the input element and close the dropdown
+        if (event.key === 'Enter') {
+          inputElement.blur();
+          closeOptionsDropdown();
+        }
+      });
+    });
+
+    moreOptionsButton.addEventListener('click', function (event) {
+      event.stopPropagation();
+      // Close all open dropdowns before opening the clicked one
+      document.querySelectorAll('.options-dropdown').forEach(function (dropdown) {
+        if (dropdown !== optionsDropdown) {
+          dropdown.classList.add('hidden');
+        }
+      });
+      optionsDropdown.classList.toggle('hidden');
+    });
+
+    optionsDropdown.appendChild(renameOption);
+    optionsDropdown.appendChild(deleteOption);
+
+    chatButtonContainer.appendChild(accessButton);
+    chatButtonContainer.appendChild(moreOptionsButton);
+
+    chatContainer.appendChild(chatButtonContainer);
+    chatContainer.appendChild(optionsDropdown);
+  }
+
   function displayChatList(chats) {
     const chatListSection = document.getElementById('chatListSection');
     chatListSection.classList.add('simplebar');
@@ -803,143 +947,8 @@ content %}
 
     chatsToDisplay.forEach(chat => {
       const chatContainer = document.createElement('div');
-      chatContainer.classList.add(
-        'flex', 'flex-col', 'bg-transparent', 'rounded', 'w-full', 'h-10',
-        'relative', 'my-2'
-      );
-
-      const chatNameWithoutDot = chat.chat_name.endsWith('.') ? chat.chat_name.slice(0, -1) : chat.chat_name;
-
-      const chatButtonContainer = document.createElement('div');
-      chatButtonContainer.classList.add('relative');
-
-      const accessButton = document.createElement('button');
-
-      // Create an inner container for the text
-      const textContainer = document.createElement('div');
-      textContainer.innerHTML = chatNameWithoutDot;
-      textContainer.style.maxWidth = '80%';
-      textContainer.style.overflow = 'hidden';
-      textContainer.style.whiteSpace = 'nowrap';
-      textContainer.style.textOverflow = 'hidden';
-
-      // Add text container to the button
-      accessButton.appendChild(textContainer);
-
-      // Add button styles
-      accessButton.classList.add(
-        'bg-transparent', 'text-white', 'text-xs', 'font-medium', 'rounded',
-        'text-xs', 'cursor-pointer', 'text-left', 'pl-2',
-        'focus:outline-none', 'hover:bg-purple-700', 'w-full', 'h-10'
-      );
-      accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
-
-      // Create the "More Options" button
-      const moreOptionsButton = document.createElement('button');
-      moreOptionsButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
-      moreOptionsButton.classList.add(
-        'absolute', 'top-1', 'right-1', 'text-white',
-        'rounded-full', 'px-3', 'py-2', 'text-xs', 'cursor-pointer', 'focus:outline-none', 'hover:text-gray-400'
-      );
-
-      // Create the options dropdown
-      const optionsDropdown = document.createElement('div');
-      optionsDropdown.classList.add(
-        'hidden', 'absolute', 'right-0', 'top-11', 'bg-gray-900',
-        'rounded-md', 'z-10', 'text-sm', 'options-dropdown' // Added a class for easier selection
-      );
-
-      // Create the "Delete Chat" option
-      const deleteOption = document.createElement('div');
-      deleteOption.innerHTML = '<i class="fas fa-trash"></i><span class="ml-2">Delete Chat</span>';
-      deleteOption.classList.add('py-3', 'px-6', 'text-red-600', 'rounded-md', 'cursor-pointer', 'text-xs', 'hover:bg-gray-800');
-      deleteOption.addEventListener('click', function (event) {
-        event.stopPropagation();
-        removeChat(chat.chat_id, chatContainer);
-      });
-
-      // Create the "Rename" option
-      const renameOption = document.createElement('div');
-      renameOption.innerHTML = '<i class="fas fa-edit"></i><span class="ml-2">Rename</span>';
-      renameOption.classList.add('py-3', 'px-6', 'cursor-pointer', 'rounded-md', 'text-xs', 'hover:bg-gray-800', 'flex', 'items-center');
-      renameOption.addEventListener('click', function (event) {
-        event.stopPropagation();
-
-        // Create an input element
-        const inputElement = document.createElement('input');
-        inputElement.type = 'text';
-        inputElement.value = chat.chat_name;
-        inputElement.classList.add('border', 'border-gray-300', 'p-1', 'text-black', 'rounded-sm');
-
-        // Replace the accessButton content with the input element
-        accessButton.innerHTML = '';
-        accessButton.appendChild(inputElement);
-
-        // Focus on the input element
-        inputElement.focus();
-
-        // Listen for blur event on input element
-        inputElement.addEventListener('blur', async function () {
-          const newChatName = inputElement.value.trim();
-
-          try {
-            // Call the updateChatName function asynchronously to update the database
-            await updateChatName(chat.chat_id, newChatName);
-
-            // If the user didn't change the name, restore the original chat name
-            if (!newChatName) {
-              inputElement.value = chat.chat_name;
-            } else {
-              // Update the global chat variable with the new name
-              chat.chat_name = newChatName;
-            }
-          } catch (error) {
-            console.error('Error updating chat name:', error);
-            // Handle the error appropriately (e.g., display an error message to the user)
-          } finally {
-            // Remove the input element and restore the original content
-            accessButton.innerHTML = chat.chat_name;
-          }
-        });
-
-        // Listen for keydown event on input element
-        inputElement.addEventListener('keydown', function (event) {
-          // Prevent default action for spacebar key
-          if (event.key === ' ' || event.code === 'Space') {
-            event.preventDefault();
-
-            // Add a space to the input
-            inputElement.value += ' ';
-          }
-
-          // If Enter key is pressed, blur the input element and close the dropdown
-          if (event.key === 'Enter') {
-            inputElement.blur();
-            closeOptionsDropdown();
-          }
-        });
-      });
-
-      moreOptionsButton.addEventListener('click', function (event) {
-        event.stopPropagation();
-        // Close all open dropdowns before opening the clicked one
-        document.querySelectorAll('.options-dropdown').forEach(function (dropdown) {
-          if (dropdown !== optionsDropdown) {
-            dropdown.classList.add('hidden');
-          }
-        });
-        optionsDropdown.classList.toggle('hidden');
-      });
-
-      optionsDropdown.appendChild(renameOption);
-      optionsDropdown.appendChild(deleteOption);
-
-      chatButtonContainer.appendChild(accessButton);
-      chatButtonContainer.appendChild(moreOptionsButton);
-
-      chatContainer.appendChild(chatButtonContainer);
-      chatContainer.appendChild(optionsDropdown);
-
+      chatContainer.id = `chat_container_${chat.chat_id}`;
+      prepareChatNameEntity(chat, chatContainer);
       chatListSection.appendChild(chatContainer);
     });
 
