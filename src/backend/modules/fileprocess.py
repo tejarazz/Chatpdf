@@ -84,7 +84,6 @@ def load_chat_data(chat_id):
         select_query = f'SELECT * FROM PDFCHAT.Chat_info WHERE chat_id = {chat_id}'
         # values = (chat_id,)
         chat_data = runSelectQuery(select_query)
-        print(chat_data)
         # Check if the chat_id exists in the database
         if chat_data:
             # Convert the messages column from string to list
@@ -99,7 +98,6 @@ def load_chat_data(chat_id):
                 res['documents'] = json.loads(chat_data[0][3])
             if chat_data[0][4] is not None:
                 res['conversation'] = json.loads(chat_data[0][4])
-            print(res)
             return True, res
         else:
             # If chat_id not found, return False and an error message
@@ -117,7 +115,6 @@ def load_chat_list():
         select_query = f'SELECT chat_id, chat_name FROM PDFCHAT.Chat_info'
         # values = (chat_id,)
         chat_data = runSelectQuery(select_query)
-        print(chat_data)
         # Check if the chat_id exists in the database
         if chat_data:
             # Convert the messages column from string to list
@@ -231,8 +228,6 @@ def get_similar_chunks(data, question):
 
         page_data = [{'page_no': page_no, 'text': text, 'score': emb_similarity_scores[page_no]}
                      for page_no, text in data['text_json'].items() if page_no in relevant_page_nos]
-
-        print("pages", relevant_page_nos)
 
         return page_data
 
