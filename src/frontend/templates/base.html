@@ -16,8 +16,7 @@
     crossorigin="anonymous" />
 
 
-
-  <title>{% block title %}{% endblock %}</title>
+  <title>TextMateAI</title>
   <!-- Inline Tailwind classes for scrollbar styling -->
   <style>
     #chatListSection .simplebar-scrollbar {
@@ -28,14 +27,19 @@
     #chatListSection.group:hover .simplebar-scrollbar {
       opacity: 1;
     }
+
+    #scrollContainer {
+      height: 29rem;
+    }
+
+    #chatListSection {
+      height: 30rem;
+    }
   </style>
 </head>
 
-<body class="bg-blue-100 font-sans">
-  <nav class="bg-blue-800 py-3 pl-4 w-32 text-white">
-    <a class="text-white md:text-md font-sans text-lg w-full text-left font-bold" href="/"
-      style="text-decoration:none">Chat Bot</a>
-  </nav>
+<body class="bg-purple-100  font-sans">
+
 
   <div class="h-full w-full">{% block content %}{% endblock %}</div>
 </body>

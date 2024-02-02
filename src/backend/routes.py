@@ -30,7 +30,7 @@ def file_upload():
             UPLOAD_FOLDER, f"{secure_filename(file.filename)}")
         file.save(file_path)
 
-        print(fileprocess(file_path, 1))
+        fileprocess(file_path, 1)
 
         return jsonify({"message": "File uploaded successfully", "file_name": file.filename}), 200
 
@@ -92,8 +92,6 @@ def create_chat():
 
         # Store chat information and retrieve the chat_id
         stored_chat_id = store_chat_info(file_names, user_id)
-
-        print(stored_chat_id)
 
         # # Convert the stored_chat_id to an integer
         # stored_chat_id = int(
@@ -197,7 +195,6 @@ def ask_question(chat_id):
 
         top_page_data_list_sorted = sorted(
             top_page_data_list, key=lambda x: x['score'])[::-1]
-        print([x['score'] for x in top_page_data_list_sorted])
         combined_text = ''
         token_counter_page_data = 0
         max_page_data_tokens = 1600
@@ -205,9 +202,6 @@ def ask_question(chat_id):
             token_counter_page_data += get_token_count(page_data['text'])
             if token_counter_page_data <= max_page_data_tokens:
                 combined_text += page_data['text']
-                print(page_data['page_no'], page_data['score'])
-
-        print("Tokens consumed :", get_token_count(combined_text))
 
         # Design a prompt that takes the top similar chunks and asks the question to LLM.
 

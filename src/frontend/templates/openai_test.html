@@ -1,26 +1,38 @@
 {% extends 'base.html' %} {% block title %} ChatBot {% endblock %} {% block
 content %}
-<!-- Main Section -->
-<div class="main-section flex flex-col md:flex-row h-full">
-  <!-- Section 1: Categories -->
-  <div class="section1 flex flex-col md:w-2/12 h-full pt-8">
-    <h6 id="chatTitle"
-      class="flex justify-center m-4 mt-2 p-2 font-medium text-sm bg-blue-800 text-white rounded-md h-12 overflow-hidden">
-      Chat Title
-    </h6>
 
+<nav
+  class="bg-gradient-to-r from-purple-700  to-purple-800 py-3 pl-6 w-full shadow-md text-white flex md:justify-start justify-center">
+  <div class="flex items-center">
+    <a class=" md:text-md font-sans text-xl w-full text-white text-left font-bold" href="/">TextMateAI</a>
+    <i class="fas fa-comment ml-2 mb-3 text-white text-xl"></i>
+  </div>
+</nav>
+<!-- Main Section -->
+<div class="main-section flex flex-col  md:flex-row h-full">
+  <!-- Section 1: Categories -->
+  <div class="section1 order-3 md:order-1 flex flex-col md:w-2/12 h-full pt-4">
+
+    <div id="chatTitle"
+      class="flex justify-center items-center m-4 mt-2 p-3 font-medium text-xs bg-purple-800 text-white rounded-md h-12 overflow-hidden">
+      Chat Title
+    </div>
+
+    <div class="p-2 text-gray-800 font-bold text-xs mx-4">
+      Previous Chats
+    </div>
     <div id="chatListSection"
-      class="simplebar items-center h-96 mx-4 my-12 p-2 bg-blue-800 text-white rounded-md overflow-auto">
+      class="simplebar items-center  mx-4 mt-1 p-2 bg-purple-800 text-white rounded-md overflow-auto">
       <!-- Content will be dynamically added here -->
     </div>
   </div>
 
   <!-- Section 2: Chat Area -->
-  <div class="section-2 w-full md:w-8/12 h-full mt-10 mx-2 p-6 bg-white rounded-lg shadow-lg">
-    <div class="h-96" id="scrollContainer">
+  <div class="section-2 order-2 md:order-2 w-full md:w-8/12 h-full mt-6 md:mx-0 mx-2 p-6 bg-white rounded-md shadow-lg">
+    <div class="" id="scrollContainer">
       <!-- Answer Container -->
-      <div id="answerContainer" class="p-4 m-1 bg-white rounded-lg">
-        <p id="answerContent" class="text-black font-sans gap-4 flex flex-col text-md capitalize"></p>
+      <div id="answerContainer" class="p-4 m-1 bg-white rounded-sm">
+        <p id="answerContent" class="text-black font-sans gap-4 flex flex-col capitalize"></p>
       </div>
 
     </div>
@@ -31,11 +43,11 @@ content %}
       <div class="flex flex-col md:flex-row items-center">
         <div class="relative flex-grow flex items-center">
           <div class="relative w-full flex">
-            <textarea class="form-input p-3 w-full font-semibold rounded-lg border-2 outline-none resize-none"
+            <textarea class="form-input p-3 md:w-full w-96 font-semibold rounded-md border-2 outline-none resize-none"
               placeholder="Ask a Question" id="questionTextarea" name="question" rows="1" oninput="toggleButton()"
               onkeydown="handleKeyDown(event)"></textarea>
             <button
-              class="border-2 bg-gray-500 py-2 px-3 rounded-lg md:rounded-lg transition-colors absolute right-4 top-1/2 transform -translate-y-1/2 z-20"
+              class="border-2 bg-gray-500 py-2 px-3 rounded-lg md:rounded-md transition-colors absolute right-4 top-1/2 transform -translate-y-1/2 z-20"
               type="button" onclick="getAnswer()" id="submitButton" disabled>
               <div class="flex items-center justify-center">
                 <i class="fas fa-arrow-up text-white" id="arrowIcon"></i>
@@ -52,20 +64,23 @@ content %}
   </div>
 
   <!-- Section 3: File and Chat List -->
-  <div class="section3 flex flex-col md:w-2/12 pt-8 h-full">
+  <div class="section3 order-1 md:order-3 flex flex-col md:w-2/12 pt-4 h-full">
     <!-- Chat List -->
-    <div class="flex flex-col m-4 mt-2 h-40 border border-black text-white rounded-md bg-blue-800">
+    <div class="flex flex-col m-4 mt-2 h-48 border border-black text-white rounded-md bg-purple-800">
       <h6 class="flex font-bold justify-center">Chat with</h6>
       <div id="pdfList" class="sitems flex flex-col py-2">
         <!-- PDF names will be dynamically added here -->
       </div>
     </div>
-
     <!-- File Upload Form -->
     <form id="uploadForm" enctype="multipart/form-data">
       <label for="fileInput"
-        class="relative flex items-center justify-center text-white font-bold px-20 py-2 rounded-md m-4 hover:bg-blue-600 bg-blue-800 cursor-pointer">
-        <span id="uploadText">Upload</span>
+        class="relative flex items-center justify-center text-white font-bold px-4 py-2 rounded-md mx-4 my-4 transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800 cursor-pointer">
+        <span id="uploadText">
+          <!-- Font Awesome upload icon -->
+          <i class="fas fa-upload mr-1"></i>
+          Upload
+        </span>
         <span id="uploadSpinner" class="absolute inset-0 flex items-center justify-center opacity-0">
           <!-- Tailwind CSS spinner -->
           <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-r-2 border-b-2 border-blue-500"></div>
@@ -73,6 +88,14 @@ content %}
       </label>
       <input type="file" id="fileInput" name="file" accept=".pdf" style="display: none" />
     </form>
+    <!-- Browse and Select Button -->
+    <button
+      class="text-white font-bold px-4 py-2 mx-4 mt-4 rounded-md transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800"
+      onclick="toggleModal()">
+      <i class="fas fa-folder-open mr-1"></i>
+      Browse and Select
+    </button>
+
     <!-- File List Display -->
     <div id="pdfList"></div>
 
@@ -96,7 +119,7 @@ content %}
               <input type="text" id="searchInput" class="form-input p-3 border outline-none flex-grow"
                 placeholder="Enter File Name" />
               <button
-                class="btn btn-primary p-3 hover:bg-blue-700 bg-blue-800 rounded-tr-lg rounded-br-lg focus:outline-none focus:shadow-outline-blue"
+                class="btn btn-primary p-3 transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800 rounded-tr-lg rounded-br-lg focus:outline-none focus:shadow-outline-blue"
                 type="button" id="searchButton">
                 <i class="fas fa-search text-white"></i>
               </button>
@@ -127,13 +150,13 @@ content %}
           <!-- Modal footer -->
           <div class="modal-footer py-4 border-t flex justify-end">
             <!-- Add two buttons at the bottom right corners -->
-            <button type="button"
-              class="bg-blue-800 border-2 hover:bg-blue-700 text-white font-medium px-6 mr-2 md:px-4 py-3 rounded-lg"
+            <!-- <button type="button"
+              class="bg-purple-800 border-2 transition duration-300 ease-in-out hover:bg-purple-700 text-white font-medium px-6 mr-2 md:px-4 py-3 rounded-lg"
               onclick="createChat('checked_file_path', 'existing_chat')">
               Existing Chat
-            </button>
+            </button> -->
             <button type="button"
-              class="bg-blue-800 border-2 hover:bg-blue-700 text-white font-medium px-6 md:px-4 py-3 rounded-lg"
+              class="bg-purple-800 border-2 transition duration-300 ease-in-out hover:bg-purple-700 text-white font-medium px-6 md:px-4 py-3 rounded-lg"
               onclick="createChat('fileInput', 'new_chat')">
               New Chat
             </button>
@@ -141,12 +164,6 @@ content %}
         </div>
       </div>
     </div>
-
-    <!-- Browse and Select Button -->
-    <button class="text-white font-bold px-6 mt-6 py-2 m-4 rounded-md hover:bg-blue-600 bg-blue-800"
-      onclick="toggleModal()">
-      Browse and Select
-    </button>
   </div>
 </div>
 
@@ -306,7 +323,7 @@ content %}
         var partconv = response.conversation;
         var chatTitle = document.getElementById("chatTitle");
         chatTitle.innerHTML = removeTrailingDot(response.chat_name) || "Chat Title";
-        chatTitle.classList.add('text-sm');
+        chatTitle.classList.add('text-xs');
         var conversationHTML = partconv.map((point) => {
           var content = point.content;
 
@@ -331,7 +348,7 @@ content %}
 
             var formattedContent = lines.join('<br>');
 
-            return `<div class="border rounded-sm p-2 border-gray-300 bg-gray-100"><p class="font-bold text-md">${point.role}:</p> ${formattedContent}</div>`;
+            return `<div class="border rounded-sm p-2 border-gray-300 bg-gray-100"><p class="font-bold font-sans  text-sm">${point.role}:</p> ${formattedContent}</div>`;
           }
         }).join("");
 
@@ -525,7 +542,7 @@ content %}
     if (data.conversation.length === 0) {
       // If chat_name is available, use it; otherwise, set a default title
       chatTitle.innerHTML = removeTrailingDot(data.chat_name) || "Chat Title";
-      chatTitle.classList.add('text-sm'); // Set the size to medium
+      chatTitle.classList.add('text-xs'); // Set the size to medium
 
       // Clear the answer content
       answerContent.innerHTML = "";
@@ -533,7 +550,7 @@ content %}
     } else {
       // Update chat title with chat_name from the server
       chatTitle.innerHTML = removeTrailingDot(data.chat_name) || "Chat Title";
-      chatTitle.classList.add('text-sm');
+      chatTitle.classList.add('text-xs');
 
       // Update conversation in the UI
       var conversationHTML = data.conversation.map((point) => {
@@ -560,7 +577,7 @@ content %}
 
           var formattedContent = lines.join('<br>');
 
-          return `<div class="border rounded-sm p-2 border-gray-300 bg-gray-100"><p class="font-bold text-md">${point.role}:</p> ${formattedContent}</div>`;
+          return `<div class="border rounded-sm p-2 border-gray-300 bg-gray-100"><p class="font-bold font-sans  text-sm">${point.role}:</p> ${formattedContent}</div>`;
         }
       }).join("");
 
@@ -636,8 +653,12 @@ content %}
         checkbox.checked = false;
       });
     } else {
-      console.log("Please select a file before creating a chat.");
-      // Optionally, you can provide feedback to the user in the UI
+      // Display error message using SweetAlert for no file selected
+      Swal.fire({
+        icon: 'error',
+        title: 'No File Selected',
+        text: 'Please select a file before creating a chat.',
+      });
     }
   }
 
@@ -809,7 +830,7 @@ content %}
       accessButton.classList.add(
         'bg-transparent', 'text-white', 'text-xs', 'font-medium', 'rounded',
         'text-xs', 'cursor-pointer', 'text-left', 'pl-2',
-        'focus:outline-none', 'hover:bg-blue-700', 'w-full', 'h-10'
+        'focus:outline-none', 'hover:bg-purple-700', 'w-full', 'h-10'
       );
       accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
 
@@ -887,11 +908,8 @@ content %}
           if (event.key === ' ' || event.code === 'Space') {
             event.preventDefault();
 
-            // Check if there are already spaces in the input
-            if (!inputElement.value.includes(' ')) {
-              // Add a space to the input
-              inputElement.value += ' ';
-            }
+            // Add a space to the input
+            inputElement.value += ' ';
           }
 
           // If Enter key is pressed, blur the input element and close the dropdown
