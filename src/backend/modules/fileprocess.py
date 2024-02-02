@@ -11,16 +11,22 @@ def fileprocess(file_path, user_id):
         op_string = json.dumps(output)
         emb_string = json.dumps(get_text_embeddings(output))
         filename = os.path.basename(file_path)
+        # Query the database to retrieve chat data based on chat_id
+        count_files_with_filename_query = f"SELECT count(*) FROM PDFCHAT.file_data WHERE file_name = '{filename}'"
+        chat_data = runSelectQuery(count_files_with_filename_query)
+        if chat_data[0][0]:
+            update_query = f"""UPDATE PDFCHAT.file_data SET text_json = %s, embeddings_json = %s  WHERE file_name = '{filename}'"""
+            runUpdateQuery(update_query, (op_string, emb_string))
+            print('File Updated Successfully')
+        else:
+            insert_file_entry_query = '''
+                INSERT INTO PDFCHAT.file_data (file_name, text_json, embeddings_json, user_id)
+                VALUES (%s, %s, %s, %s)
+            '''
 
-        ######
-
-        insert_file_entry_query = '''
-            INSERT INTO PDFCHAT.file_data (file_name, text_json, embeddings_json, user_id)
-            VALUES (%s, %s, %s, %s)
-        '''
-
-        runInsertQuery(insert_file_entry_query,
-                       (filename, op_string, emb_string, user_id))
+            runInsertQuery(insert_file_entry_query,
+                           (filename, op_string, emb_string, user_id))
+            print('File Inserted Successfully')
         print("file process end")
         return True
 
@@ -101,6 +107,32 @@ def load_chat_data(chat_id):
             return True, res
         else:
             # If chat_id not found, return False and an error message
+            return False, {"error": "Chat not found"}
+
+    except Exception as e:
+        # Handle other potential errors and return False and an error message
+        print("some exception occured", e)
+        return False, {"error": str(e)}
+
+
+def load_file_list():
+    try:
+        # Query the database to retrieve chat data based on chat_id
+        select_query = f'SELECT file_name FROM PDFCHAT.file_data'
+        # values = (chat_id,)
+        file_data = runSelectQuery(select_query)
+        # Check if the chat_id exists in the database
+        if file_data:
+            # Convert the messages column from string to list
+            res = []
+            for rec_tup in file_data:
+                rec = {
+
+                }
+                rec['file_name'] = rec_tup[0]
+                res.append(rec)
+            return True, res
+        else:
             return False, {"error": "Chat not found"}
 
     except Exception as e:

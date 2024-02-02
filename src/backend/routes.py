@@ -1,6 +1,8 @@
 import os
 from flask import Flask, request, jsonify
-from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, load_chat_list, del_chat, update_chatname, get_embeddings_of_doc, get_similar_chunks
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data
+from modules.fileprocess import load_chat_list, del_chat, update_chatname, get_embeddings_of_doc
+from modules.fileprocess import get_similar_chunks,  load_file_list
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -31,6 +33,8 @@ def file_upload():
         file.save(file_path)
 
         fileprocess(file_path, 1)
+        if os.path.exists(file_path) and file_path.endswith('.pdf'):
+            os.remove(file_path)
 
         return jsonify({"message": "File uploaded successfully", "file_name": file.filename}), 200
 
@@ -41,21 +45,19 @@ def file_upload():
 def list_files():
     try:
         UPLOAD_FOLDER = Config.UPLOAD_FOLDER
-        files = os.listdir(UPLOAD_FOLDER)
-        file_list = []
+        status, content = load_file_list()
+        if status:
+            file_list = []
+            files = content
+            for file in files:
+                file_info = {
+                    'file_name': file['file_name']
+                }
+                file_list.append(file_info)
 
-        for file in files:
-            file_path = os.path.join(UPLOAD_FOLDER, file)
-            file_info = {
-                'file_name': file,
-                'file_path': file_path,
-                'file_size': os.path.getsize(file_path),
-                'last_modified': os.path.getmtime(file_path)
-            }
-            file_list.append(file_info)
-
-        return jsonify({"files": file_list}), 200
-
+            return jsonify({"files": file_list}), 200
+        else:
+            raise Exception(content)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
