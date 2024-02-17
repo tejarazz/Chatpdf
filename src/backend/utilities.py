@@ -8,20 +8,25 @@ from typing import List
 import openai
 import os
 import tiktoken
+import google.generativeai as genai
 
+google_api_key=os.environ['GOOGLE_API_KEY']
 openai.api_key = os.environ.get("OPENAI_API")
+genai.configure(api_key=google_api_key)
 
-# Modules
 
+# def getResponseFromMessages(messages):
+
+#     chat_completion = openai.ChatCompletion.create(
+#         model="gpt-3.5-turbo", messages=messages)
+#     bot_response = chat_completion.choices[0].message.content
+#     return bot_response
 
 def getResponseFromMessages(messages):
-
-    chat_completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo", messages=messages)
-#     print(chat_completion)
-    bot_response = chat_completion.choices[0].message.content
+    model = genai.GenerativeModel('gemini-pro')
+    conv_history = [{'parts':[interaction['content']], 'role':interaction['role'] if interaction['role']!='assistant' else 'model'} for interaction in messages]
+    bot_response = model.generate_content(conv_history).text
     return bot_response
-
 
 def getSQLConnection():
     try:
@@ -155,7 +160,8 @@ def get_text_embeddings(text_dict: dict) -> dict:
     Returns:
     - embeddings_dict: dict, a dictionary where keys are document names and values are embeddings
     """
-    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    # model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {'device': 'cpu'}
     encode_kwargs = {'normalize_embeddings': False}
     hf = HuggingFaceEmbeddings(
@@ -183,7 +189,8 @@ def get_embeddings_of_text(text: str) -> List[float]:
     Returns:
     - embeddings: List[float], embeddings for the input text
     """
-    model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_name = "sentence-transformers/all-MiniLM-L6-v2"
+    # model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {'device': 'cpu'}
     encode_kwargs = {'normalize_embeddings': False}
     hf = HuggingFaceEmbeddings(

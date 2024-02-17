@@ -1,13 +1,13 @@
 {% extends 'base.html' %} {% block title %} ChatBot {% endblock %} {% block
 content %}
 
-<nav class="bg-purple-700 py-3 w-full shadow-lg text-white flex md:justify-start justify-center">
+<nav class="bg-blue-600 py-3 w-full shadow-lg text-white flex md:justify-start justify-center">
   <div class="flex items-center justify-between w-full">
-    <div class="pl-6">
+    <div class="pl-14">
       <a class=" md:text-md font-sans text-xl w-full text-white text-left font-bold" href="/">TextMateAI</a>
       <i class="fas fa-comment ml-1 text-white text-xl"></i>
     </div>
-    <a class="pr-10 font-semibold hover:text-purple-300" href="#">Login</a>
+    <a class="pr-10 font-semibold hover:text-purple-300" href="loginpage.html">Login</a>
   </div>
 </nav>
 <!-- Main Section -->
@@ -16,7 +16,7 @@ content %}
   <div class="section1 order-3 md:order-1 flex flex-col md:w-2/12 h-full pt-4">
 
     <div id="chatTitle"
-      class="flex justify-center items-center shadow-lg m-4 mt-2 p-3 font-medium text-xs bg-purple-800 text-white rounded-md h-12 overflow-hidden">
+      class="flex justify-center items-center shadow-lg m-4 mt-2 p-3 font-medium text-xs bg-blue-700 text-white rounded-md h-12 overflow-hidden">
       Chat Title
     </div>
 
@@ -24,7 +24,7 @@ content %}
       Previous Chats
     </div>
     <div id="chatListSection"
-      class="simplebar items-center  mx-4 mt-1 p-2 bg-purple-800 text-white shadow-lg rounded-md overflow-auto">
+      class="simplebar items-center  mx-4 mt-1 p-2 bg-blue-700 text-white shadow-lg rounded-md overflow-auto">
       <!-- Content will be dynamically added here -->
     </div>
   </div>
@@ -68,7 +68,7 @@ content %}
   <!-- Section 3: File and Chat List -->
   <div class="section3 order-1 md:order-3 flex flex-col md:w-2/12 pt-4 h-full">
     <!-- Chat List -->
-    <div class="flex flex-col m-4 mt-2 h-48 border border-black text-white rounded-md bg-purple-800">
+    <div class="flex flex-col m-4 mt-2 h-48 shadow-lg text-white rounded-md bg-blue-700">
       <h6 class="flex font-bold justify-center">Chat with</h6>
       <div id="pdfList" class="sitems flex flex-col py-2">
         <!-- PDF names will be dynamically added here -->
@@ -77,7 +77,7 @@ content %}
     <!-- File Upload Form -->
     <form id="uploadForm" enctype="multipart/form-data">
       <label for="fileInput"
-        class="relative flex items-center shadow-lg justify-center text-white font-bold px-4 py-2 rounded-md mx-4 my-4 transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800 cursor-pointer">
+        class="relative flex items-center shadow-lg justify-center text-white font-bold px-4 py-2 rounded-md mx-4 my-4 transition duration-300 ease-in-out hover:bg-blue-600 bg-blue-700 cursor-pointer">
         <span id="uploadText">
           <!-- Font Awesome upload icon -->
           <i class="fas fa-upload mr-1"></i>
@@ -92,7 +92,7 @@ content %}
     </form>
     <!-- Browse and Select Button -->
     <button
-      class="text-white shadow-lg font-bold px-4 py-2 mx-4 mt-4 rounded-md transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800"
+      class="text-white shadow-lg font-bold px-4 py-2 mx-4 mt-4 rounded-md transition duration-300 ease-in-out hover:bg-blue-600 bg-blue-700"
       onclick="toggleModal()">
       <i class="fas fa-folder-open mr-1"></i>
       Browse and Select
@@ -121,7 +121,7 @@ content %}
               <input type="text" id="searchInput" class="form-input p-3 border outline-none flex-grow"
                 placeholder="Enter File Name" />
               <button
-                class="btn btn-primary p-3 transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800 rounded-tr-lg rounded-br-lg focus:outline-none focus:shadow-outline-blue"
+                class="btn btn-primary p-3 transition duration-300 ease-in-out hover:bg-blue-600 bg-blue-700 rounded-tr-lg rounded-br-lg focus:outline-none focus:shadow-outline-blue"
                 type="button" id="searchButton">
                 <i class="fas fa-search text-white"></i>
               </button>
@@ -153,12 +153,12 @@ content %}
           <div class="modal-footer py-4 border-t flex justify-end">
             <!-- Add two buttons at the bottom right corners -->
             <!-- <button type="button"
-              class="bg-purple-800 border-2 transition duration-300 ease-in-out hover:bg-purple-700 text-white font-medium px-6 mr-2 md:px-4 py-3 rounded-lg"
+              class="bg-blue-700 border-2 transition duration-300 ease-in-out hover:bg-blue-600 text-white font-medium px-6 mr-2 md:px-4 py-3 rounded-lg"
               onclick="createChat('checked_file_path', 'existing_chat')">
               Existing Chat
             </button> -->
             <button type="button"
-              class="bg-purple-800 border-2 transition duration-300 ease-in-out hover:bg-purple-700 text-white font-medium px-6 md:px-4 py-3 rounded-lg"
+              class="bg-blue-700 border-2 transition duration-300 ease-in-out hover:bg-blue-600 text-white font-medium px-6 md:px-4 py-3 rounded-lg"
               onclick="createChat('fileInput', 'new_chat')">
               New Chat
             </button>
@@ -342,7 +342,7 @@ content %}
           } else if (/^```[^`]+```$/.test(content)) {
             // Extract code content between backticks and format for other languages
             var codeContent = content.replace(/^```|```$/g, '');
-            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre>${Prism.highlight(codeContent, Prism.languages.auto, 'auto')}</pre></div>`;
+            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre>${codeContent}</pre></div>`;
           } else {
             // Split content into lines and remove backticks
             var lines = content.split('\n').map(line => {
@@ -516,7 +516,8 @@ content %}
           "mx-2",
           "overflow-hidden",
           "whitespace-nowrap",
-          "text-center"
+          "text-center",
+          "shadow-lg"
         );
 
         // Create the label element
@@ -571,7 +572,7 @@ content %}
         } else if (/^```[^`]+```$/.test(content)) {
           // Extract code content between backticks and format for other languages
           var codeContent = content.replace(/^```|```$/g, '');
-          return `<div class="border rounded-md p-1  border-gray-300 bg-gray-100"><pre>${Prism.highlight(codeContent, Prism.languages.auto, 'auto')}</pre></div>`;
+          return `<div class="border rounded-md p-1  border-gray-300 bg-gray-100"><pre>${codeContent}</pre></div>`;
         } else {
           // Split content into lines and remove backticks
           var lines = content.split('\n').map(line => {
@@ -826,7 +827,7 @@ content %}
     accessButton.classList.add(
       'bg-transparent', 'text-white', 'text-xs', 'font-medium', 'rounded',
       'text-xs', 'cursor-pointer', 'text-left', 'pl-2',
-      'focus:outline-none', 'hover:bg-purple-700', 'w-full', 'h-10'
+      'focus:outline-none', 'hover:bg-blue-600', 'w-full', 'h-10'
     );
     accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
 

@@ -6,12 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <title>Login and Signup Page</title>
+
 </head>
 
-<body class="bg-purple-100 font-sans flex items-center justify-center h-screen">
-  <div class="w-1/4">
+<body class="bg-blue-200 font-sans flex flex-col items-center justify-start h-screen">
+  <nav class="bg-blue-600 py-5 w-full shadow-lg text-white flex mb-28 justify-center">
+    <div class="flex items-center justify-center w-full">
+      <div class="pl-6">
+        <a class=" md:text-md font-sans text-2xl w-full text-white font-bold" href="/">TextMateAI</a>
+        <i class="fas fa-comment ml-1 text-white text-xl"></i>
+      </div>
+    </div>
+  </nav>
+  <div class="w-4/12">
     <!-- Login Form -->
-    <div id="loginContainer" class="bg-white p-8 rounded-md shadow-md max-w-full">
+    <div id="loginContainer" class="bg-white p-8 rounded-md shadow-lg max-w-full form-container">
       <h2 class="text-3xl font-semibold mb-4 text-center text-gray-800">Login</h2>
       <form id="loginForm" class="space-y-4">
         <div>
@@ -34,7 +43,7 @@
     </div>
 
     <!-- Signup Form -->
-    <div id="signupContainer" class="hidden bg-white p-8 rounded-md shadow-md max-w-full">
+    <div id="signupContainer" class="hidden bg-white p-8 rounded-md shadow-lg max-w-full form-container">
       <h2 class="text-3xl font-semibold mb-4 text-center text-gray-800">Signup</h2>
       <form id="signupForm" class="space-y-4">
         <div>
@@ -61,33 +70,50 @@
       </div>
     </div>
   </div>
-
-  <script>
-    function toggleForm(activeFormId) {
-      const loginContainer = document.getElementById('loginContainer');
-      const signupContainer = document.getElementById('signupContainer');
-
-      if (activeFormId === 'loginContainer') {
-        loginContainer.classList.remove('hidden');
-        signupContainer.classList.add('hidden');
-      } else {
-        loginContainer.classList.add('hidden');
-        signupContainer.classList.remove('hidden');
+    <script>
+      function toggleForm(activeFormId) {
+        const loginContainer = document.getElementById('loginContainer');
+        const signupContainer = document.getElementById('signupContainer');
+        
+        const scaleDown = (element) => {
+          element.style.transform = 'scale(0)';
+          element.style.transition = 'transform 1s ease-in-out';
+        };
+        
+        const scaleUp = (element) => {
+          element.style.transform = 'scale(1)';
+          element.style.transition = 'transform 1s ease-in-out';
+        };
+        
+        if (activeFormId === 'loginContainer') {
+          scaleDown(signupContainer);
+          setTimeout(() => {
+            signupContainer.classList.add('hidden');
+            scaleUp(loginContainer);
+            loginContainer.classList.remove('hidden');
+          }, 200);
+        } else {
+          scaleDown(loginContainer);
+          setTimeout(() => {
+            loginContainer.classList.add('hidden');
+            scaleUp(signupContainer);
+            signupContainer.classList.remove('hidden');
+          }, 200);
+        }
       }
-    }
 
-    document.getElementById("loginForm").addEventListener("submit", function (event) {
-      event.preventDefault();
-      // Login form submission logic here
-      alert("login success")
-    });
-
-    document.getElementById("signupForm").addEventListener("submit", function (event) {
-      event.preventDefault();
-      alert("signed up")
-      // Signup form submission logic here
-    });
-  </script>
+      document.getElementById("loginForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        // Login form submission logic here
+        alert("login success")
+      });
+    
+      document.getElementById("signupForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        alert("signed up")
+        // Signup form submission logic here
+      });
+    </script>
 </body>
 
 </html>
