@@ -60,6 +60,19 @@ def runSelectQuery(query):
         print(f'Some error occurred: {e}')
     return results
 
+def runSelectQuery_with_values(query,values):
+    results = None
+    try:
+        with getSQLConnection() as connection:
+            if connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(query,values)
+                    results = cursor.fetchall()
+            else:
+                raise Exception("Failed to connect to MySQL")
+    except Exception as e:
+        print(f'Some error occurred: {e}')
+    return results
 
 def runInsertQuery(query, values):
     try:

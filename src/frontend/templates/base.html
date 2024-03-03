@@ -13,14 +13,8 @@
   <link rel="stylesheet" href="https://unpkg.com/simplebar@5.3.3/dist/simplebar.min.css">
   <script src="https://unpkg.com/simplebar@5.3.4/dist/simplebar.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    crossorigin="anonymous" />
-    <script src="
-    https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js
-    "></script>
-    <link href="
-    https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css
-    " rel="stylesheet">
-
+    crossorigin="anonymous"/>
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/12122/12122368.png" type="image/png">
   <title>TextMateAI</title>
   <!-- Inline Tailwind classes for scrollbar styling -->
   <style>
@@ -33,19 +27,65 @@
       opacity: 1;
     }
 
+    /* Change the color of the scrollbar track */
+    .simplebar-scrollbar::before {
+      background-color: white;
+    }
+
+
     #scrollContainer {
-      height: 29rem;
+      height: 74vh;
     }
 
     #chatListSection {
       height: 30rem;
     }
+    .pc{
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .main-section{
+      height: calc(100vh - 48px)
+    }
+    
+
+    .navbar{
+      background-color: rgb( 95, 85, 238 );
+    }
+    .section2{
+      background-color: #212121;
+    }
+
+
+    .section1,.section3,.form-input,.modal-content{
+      background-color: #171717;
+    }
+
+    .upload,.browse{
+      background-color: rgb( 95, 85, 238 );
+    }
+
+    .dropdown {
+      position: relative;
+    }
+    
+    .dropdown-content {
+      display: none;
+      font-size: 12px;
+      position: absolute;
+      background-color: rgb(49, 48, 48);
+      min-width: 160px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+      top: -74px;
+      left: 45px; /* Adjust this value as needed */
+    }
+    
+
   </style>
 </head>
 
-<body class="bg-blue-200  font-sans">
-
-
+<body class="font-sans md:overflow-hidden">
   <div class="h-full w-full">{% block content %}{% endblock %}</div>
 </body>
 
