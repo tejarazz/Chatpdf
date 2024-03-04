@@ -1,7 +1,7 @@
 # app.py
 
-from routes import  ask_question, create_chat, delete_chat, file_upload, list_all_chats,get_user_details
-from routes import load_chat, remove_document, list_files, update_chat_name,login,sign_up, logout
+from routes import ask_question, create_chat, delete_chat, file_upload, list_all_chats, get_user_details
+from routes import load_chat, remove_document, list_files, update_chat_name, login, sign_up, logout
 from flask import Flask
 from flask_cors import CORS
 from db import configure_database
@@ -9,12 +9,12 @@ from models import create_tables
 from flask_session import Session
 
 
-
 def create_app():
     app = Flask(__name__)
-    app.secret_key = 'your_secret_key_here'  # Set a secret key for session encryption
+    # Set a secret key for session encryption
+    app.secret_key = 'your_secret_key_here'
     app.config['SESSION_TYPE'] = 'filesystem'
-    app.config['SESSION_FILE_DIR']='./sessions'
+    app.config['SESSION_FILE_DIR'] = './sessions'
 
     Session(app)
     CORS(app)
@@ -49,8 +49,9 @@ def create_app():
     app.add_url_rule('/sign_up',
                      'sign_up', sign_up, methods=['POST'])
     app.add_url_rule('/logout',
-                    'logout', logout, methods=['GET'])
-    app.add_url_rule('/get_user_details', 'get_user_details', get_user_details, methods=['GET'])
+                     'logout', logout, methods=['GET'])
+    app.add_url_rule('/get_user_details', 'get_user_details',
+                     get_user_details, methods=['GET'])
     # New route to list all files
     app.add_url_rule('/list-files', 'list_files', list_files, methods=['GET'])
 

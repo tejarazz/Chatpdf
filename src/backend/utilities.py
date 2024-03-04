@@ -10,7 +10,7 @@ import os
 import tiktoken
 import google.generativeai as genai
 
-google_api_key=os.environ['GOOGLE_API_KEY']
+google_api_key = os.environ['GOOGLE_API_KEY']
 openai.api_key = os.environ.get("OPENAI_API")
 genai.configure(api_key=google_api_key)
 
@@ -24,9 +24,11 @@ genai.configure(api_key=google_api_key)
 
 def getResponseFromMessages(messages):
     model = genai.GenerativeModel('gemini-pro')
-    conv_history = [{'parts':[interaction['content']], 'role':interaction['role'] if interaction['role']!='assistant' else 'model'} for interaction in messages]
+    conv_history = [{'parts': [interaction['content']], 'role': interaction['role']
+                     if interaction['role'] != 'assistant' else 'model'} for interaction in messages]
     bot_response = model.generate_content(conv_history).text
     return bot_response
+
 
 def getSQLConnection():
     try:
@@ -60,19 +62,21 @@ def runSelectQuery(query):
         print(f'Some error occurred: {e}')
     return results
 
-def runSelectQuery_with_values(query,values):
+
+def runSelectQuery_with_values(query, values):
     results = None
     try:
         with getSQLConnection() as connection:
             if connection:
                 with connection.cursor() as cursor:
-                    cursor.execute(query,values)
+                    cursor.execute(query, values)
                     results = cursor.fetchall()
             else:
                 raise Exception("Failed to connect to MySQL")
     except Exception as e:
         print(f'Some error occurred: {e}')
     return results
+
 
 def runInsertQuery(query, values):
     try:
@@ -173,8 +177,7 @@ def get_text_embeddings(text_dict: dict) -> dict:
     Returns:
     - embeddings_dict: dict, a dictionary where keys are document names and values are embeddings
     """
-    model_name = "sentence-transformers/all-MiniLM-L6-v2"
-    # model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {'device': 'cpu'}
     encode_kwargs = {'normalize_embeddings': False}
     hf = HuggingFaceEmbeddings(
@@ -202,8 +205,7 @@ def get_embeddings_of_text(text: str) -> List[float]:
     Returns:
     - embeddings: List[float], embeddings for the input text
     """
-    model_name = "sentence-transformers/all-MiniLM-L6-v2"
-    # model_name = "sentence-transformers/all-mpnet-base-v2"
+    model_name = "sentence-transformers/all-mpnet-base-v2"
     model_kwargs = {'device': 'cpu'}
     encode_kwargs = {'normalize_embeddings': False}
     hf = HuggingFaceEmbeddings(

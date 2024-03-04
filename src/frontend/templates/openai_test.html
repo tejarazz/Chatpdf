@@ -7,7 +7,8 @@ content %}
       <img class="h-6 w-6 mr-2" src="https://cdn-icons-png.flaticon.com/512/12122/12122368.png">
       <a class="name md:text-md font-sans text-md w-full text-white text-left font-bold">TextMateAI</a>
     </div>
-    <a id="loginLink" class="pr-10 font-semibold text-white hover:text-gray-300" style="display: none" href="login">Login</a>
+    <a id="loginLink" class="pr-10 font-semibold text-white hover:text-gray-300" style="display: none"
+      href="login">Login</a>
   </div>
 </nav>
 <!-- Main Section -->
@@ -28,7 +29,8 @@ content %}
     <div class="relative mt-auto dropdown" id="profileSection" style="display: none">
       <div class="flex items-center justify-start px-4 border-t border-gray-800 text-sm h-12 overflow-hidden"
         onmouseover="showDropdown()" onmouseout="hideDropdown()">
-        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Image" class="h-6 w-6 rounded-full mr-2" />
+        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+          alt="Profile Image" class="h-6 w-6 rounded-full mr-2" />
         <span id="username" class="font-bold text-md">Username</span>
       </div>
       <div class="dropdown-content " id="dropdownContent" onmouseover="showDropdown()" onmouseout="hideDropdown()">
@@ -101,7 +103,8 @@ content %}
       <input type="file" id="fileInput" name="file" accept=".pdf" style="display: none" />
     </form>
     <!-- Browse and Select Button -->
-    <button class="browse shadow-lg font-bold px-2 py-1 text-md mx-4 mt-8 rounded-md text-white" onclick="toggleModal()">
+    <button class="browse shadow-lg font-bold px-2 py-1 text-md mx-4 mt-8 rounded-md text-white"
+      onclick="toggleModal()">
       <i class="fas fa-folder-open mr-1"></i>
       Browse and Select
     </button>
@@ -126,12 +129,16 @@ content %}
           <div class="modal-body py-4">
             <!-- Search box with clickable search button -->
             <div class="mb-4 flex items-center">
-              <input type="text" id="searchInput" class="form-input rounded-l-md p-3 border border-gray-600 outline-none flex-grow" placeholder="Enter File Name">
-              <button class="btn btn-primary p-3 transition duration-300 ease-in-out hover:bg-purple-500 bg-purple-600 rounded-r-md outline-none focus:shadow-outline-blue" type="button" id="searchButton">
+              <input type="text" id="searchInput"
+                class="form-input rounded-l-md p-3 border border-gray-600 outline-none flex-grow"
+                placeholder="Enter File Name">
+              <button
+                class="btn btn-primary p-3 transition duration-300 ease-in-out hover:bg-purple-500 bg-purple-600 rounded-r-md outline-none focus:shadow-outline-blue"
+                type="button" id="searchButton">
                 <i class="fas fa-search text-white"></i>
               </button>
             </div>
-            
+
 
             <!-- Scrollable checkbox list of files -->
             <div class="file-list overflow-auto max-h-48" id="fileList">
@@ -598,83 +605,83 @@ content %}
     return str.endsWith(".") ? str.slice(0, -1) : str;
   }
 
-// Function to update PDF list with chat data
-function updatePdfListWithChatData(data) {
-  const pdfListElement = document.getElementById("pdfList");
+  // Function to update PDF list with chat data
+  function updatePdfListWithChatData(data) {
+    const pdfListElement = document.getElementById("pdfList");
 
-  if (pdfListElement) {
-    // Update the PDF list based on chat data
-    pdfListElement.innerHTML = "";
+    if (pdfListElement) {
+      // Update the PDF list based on chat data
+      pdfListElement.innerHTML = "";
 
-    // Parse the documents JSON array from the chat data
-    const documents = data.documents;
+      // Parse the documents JSON array from the chat data
+      const documents = data.documents;
 
-    documents.forEach((documentName) => {
-      // Remove trailing dot from the documentName
-      const cleanedDocumentName = removeTrailingDot(documentName);
+      documents.forEach((documentName) => {
+        // Remove trailing dot from the documentName
+        const cleanedDocumentName = removeTrailingDot(documentName);
 
-      // Create a container div for the label and remove button
-      const container = createDocumentContainer(cleanedDocumentName);
+        // Create a container div for the label and remove button
+        const container = createDocumentContainer(cleanedDocumentName);
 
-      // Append the container to the PDF list
-      pdfListElement.appendChild(container);
+        // Append the container to the PDF list
+        pdfListElement.appendChild(container);
 
-      // Add a line break after each container
-      pdfListElement.appendChild(document.createElement("br"));
-    });
-  }
-}
-
-    // Function to create a container for a document with label and remove button
-    function createDocumentContainer(documentName) {
-      // Create the container div
-      const container = document.createElement("div");
-      container.classList.add(
-        "text-xs",
-        "text-white",
-        "font-medium",
-        "rounded-md",
-        "p-2",
-        "mx-4",
-        "overflow-hidden",
-        "whitespace-nowrap",
-        "flex",
-        "justify-around",
-        "shadow-lg"
-      );
-      container.style.backgroundColor = "#1777ff";
-
-      // Create the label element
-      const label = document.createElement("label");
-      label.textContent = documentName;
-
-      // Append the label and remove button to the container
-      container.appendChild(label);
-
-      return container;
+        // Add a line break after each container
+        pdfListElement.appendChild(document.createElement("br"));
+      });
     }
+  }
+
+  // Function to create a container for a document with label and remove button
+  function createDocumentContainer(documentName) {
+    // Create the container div
+    const container = document.createElement("div");
+    container.classList.add(
+      "text-xs",
+      "text-white",
+      "font-medium",
+      "rounded-md",
+      "p-2",
+      "mx-4",
+      "overflow-hidden",
+      "whitespace-nowrap",
+      "flex",
+      "justify-around",
+      "shadow-lg"
+    );
+    container.style.backgroundColor = "#1777ff";
+
+    // Create the label element
+    const label = document.createElement("label");
+    label.textContent = documentName;
+
+    // Append the label and remove button to the container
+    container.appendChild(label);
+
+    return container;
+  }
 
   function updateconversation(data) {
     var chatTitle = document.getElementById("chatTitle");
     var answerContainer = document.getElementById("answerContainer");
     var answerContent = document.getElementById("answerContent");
-  
+
     // Function to remove trailing dot from a string
     function removeTrailingDot(str) {
       return str.endsWith(".") ? str.slice(0, -1) : str;
     }
-  
+
     // Function to remove stars from a string
     function removeStars(str) {
       return str.replace(/\*/g, ""); // Using a regular expression to globally replace stars
     }
-  
+
     // Check if there is no conversation data
     if (data.conversation.length === 0) {
       // If chat_name is available, use it; otherwise, set a default title
       chatTitle.innerHTML = removeTrailingDot(data.chat_name) || "Chat Title";
       chatTitle.classList.add("text-xs"); // Set the size to medium
-  
+
       // Clear the answer content
       answerContent.innerHTML = "";
       answerContainer.style.display = "none";
@@ -682,14 +689,14 @@ function updatePdfListWithChatData(data) {
       // Update chat title with chat_name from the server
       chatTitle.innerHTML = removeTrailingDot(data.chat_name) || "Chat Title";
       chatTitle.classList.add("text-xs");
-  
+
       // Update conversation in the UI
       var conversationHTML = data.conversation
         .map((point) => {
           var content = point.content;
           // Remove stars from content
           content = removeStars(content);
-  
+
           // Check if content contains code block
           if (/^```html[\s\S]+```$/.test(content)) {
             // Extract HTML code content between backticks
@@ -712,19 +719,19 @@ function updatePdfListWithChatData(data) {
               }
               return parts.join(":").replace(/`/g, "");
             });
-  
+
             var formattedContent = lines.join("<br>");
-  
+
             return `<div class="rounded-sm p-4 font-sans text-sm rounded-md bg-black"><p class="font-bold text-gray-400 capitalize font-sans text-sm">${point.role}:</p> ${formattedContent}</div>`;
           }
         })
         .join("");
-  
+
       answerContent.innerHTML = conversationHTML;
       answerContainer.style.display = "block";
     }
   }
-  
+
   // Function to load chat data and update PDF list
   function loadChat() {
     // Get the chat_id from the URL
@@ -1216,25 +1223,25 @@ function updatePdfListWithChatData(data) {
 
 
 
- function get_user_details(){
-  fetch("{{ params['backend_base_path'] }}" + "get_user_details", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      // Handle the response from the server, e.g., show success message or handle errors
-      console.log(data);
-      document.getElementById("username").innerHTML = data.username
+  function get_user_details() {
+    fetch("{{ params['backend_base_path'] }}" + "get_user_details", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
- }
+      .then((response) => response.json())
+      .then((data) => {
+        // Handle the response from the server, e.g., show success message or handle errors
+        console.log(data);
+        document.getElementById("username").innerHTML = data.username
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
 
- get_user_details()
+  get_user_details()
 
 </script>
 

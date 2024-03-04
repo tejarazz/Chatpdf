@@ -2,46 +2,52 @@ from utilities import read_pdf, runInsertQuery, get_text_embeddings, runSelectQu
 import os
 import json
 
+
 class UserIdTakenException(Exception):
     pass
+
+
 class EmailTakenException(Exception):
     pass
 
-def loginform(username,password):
-    
+
+def loginform(username, password):
+
     fetch_user_data_query = f"SELECT count(*), id FROM PDFCHAT.users where username =%s and password_hash=%s"
-    
-    res = runSelectQuery_with_values(fetch_user_data_query,(username,password))
+
+    res = runSelectQuery_with_values(
+        fetch_user_data_query, (username, password))
     if res[0][0]:
         return True, res[0][1]
     else:
         return False, None
-    
+
+
 def signup_form(username, email, password_hash):
     try:
-        
-        print('pwd',password_hash)
+
+        print('pwd', password_hash)
         check_pre_signup_username_query = '''SELECT COUNT(*) FROM PDFCHAT.users WHERE username = %s'''
         check_pre_signup_email_query = '''SELECT COUNT(*) FROM PDFCHAT.users WHERE email = %s'''
-        
-        if runSelectQuery_with_values(check_pre_signup_username_query,(username,))[0][0]:
+
+        if runSelectQuery_with_values(check_pre_signup_username_query, (username,))[0][0]:
             raise UserIdTakenException
-        if runSelectQuery_with_values(check_pre_signup_email_query,(email,))[0][0]:
+        if runSelectQuery_with_values(check_pre_signup_email_query, (email,))[0][0]:
             raise EmailTakenException
-        
+
         insert_user_entry_query = '''
                     INSERT INTO PDFCHAT.users (username, email, password_hash) VALUES (%s, %s, %s)
                 '''
 
         runInsertQuery(insert_user_entry_query,
-                            (username, email, password_hash))
+                       (username, email, password_hash))
         return True, None
     except UserIdTakenException:
         return False, f'User Name - {username} is  already taken'
     except EmailTakenException:
         return False, f'Email - {email} is already in use'
-    
-    
+
+
 def get_user_info(user_id):
     try:
         select_query = f'SELECT username FROM PDFCHAT.users WHERE id ={user_id}'
@@ -52,9 +58,10 @@ def get_user_info(user_id):
         else:
             raise Exception
     except Exception as e:
-        print("some error occured",e)
-        return None       
+        print("some error occured", e)
+        return None
     return False
+
 
 def fileprocess(file_path, user_id):
     print("file process started")
@@ -64,10 +71,10 @@ def fileprocess(file_path, user_id):
         op_string = json.dumps(output)
         emb_string = json.dumps(get_text_embeddings(output))
         filename = os.path.basename(file_path)
-        
+
         # Query the database to retrieve chat data based on chat_id
         count_files_with_filename_query = f"SELECT count(*) FROM PDFCHAT.file_data WHERE file_name = '{filename}' and user_id = {user_id}"
-        
+
         # Update the embeddings and text in existing record
         if runSelectQuery(count_files_with_filename_query)[0][0]:
             update_query = f"""UPDATE PDFCHAT.file_data SET text_json = %s, embeddings_json = %s  WHERE file_name = '{filename}' and user_id = {user_id}"""
@@ -90,7 +97,7 @@ def fileprocess(file_path, user_id):
         return False
 
 
-def save_conversation(conversation, chat_id,user_id, chat_name=None):
+def save_conversation(conversation, chat_id, user_id, chat_name=None):
     try:
         # Format the chat_query string using a ternary operator
         chat_query = ", chat_name = %s" if chat_name else ""
@@ -103,10 +110,10 @@ SET conversation = %s{chat_query} WHERE chat_id = %s and user_id = %s
         # Pass parameters as a tuple
         if chat_name:
             runInsertQuery(update_chat_query, (json.dumps(
-                conversation), chat_name, chat_id,user_id))
+                conversation), chat_name, chat_id, user_id))
         else:
             runInsertQuery(update_chat_query,
-                           (json.dumps(conversation), chat_id,user_id))
+                           (json.dumps(conversation), chat_id, user_id))
 
         return True
 
@@ -139,7 +146,7 @@ def store_chat_info(documents, user_id):
         return 1
 
 
-def load_chat_data(chat_id,user_id):
+def load_chat_data(chat_id, user_id):
     try:
         # Query the database to retrieve chat data based on chat_id
         select_query = f'SELECT * FROM PDFCHAT.Chat_info WHERE chat_id = {chat_id} and user_id ={user_id}'
@@ -202,7 +209,7 @@ def load_chat_list(user_id):
         # Query the database to retrieve chat data based on chat_id
         select_query = f'SELECT chat_id, chat_name FROM PDFCHAT.Chat_info where user_id = %s'
         # values = (chat_id,)
-        chat_data = runSelectQuery_with_values(select_query,(user_id,))
+        chat_data = runSelectQuery_with_values(select_query, (user_id,))
         # Check if the chat_id exists in the database
         if chat_data:
             # Convert the messages column from string to list
@@ -222,9 +229,9 @@ def load_chat_list(user_id):
         return False, {"error": str(e)}
 
 
-def del_chat(chat_id,user_id):
+def del_chat(chat_id, user_id):
     try:
-        values = (chat_id,user_id)
+        values = (chat_id, user_id)
         # Delete the chat with the specified chat_id
         delete_query = 'DELETE FROM PDFCHAT.Chat_info WHERE chat_id = %s and user_id = %s'
         runDeleteQuery(delete_query, values)
@@ -250,9 +257,9 @@ def rem_doc(chat_id, user_id):
         return False, {"error": "Failed to remove document"}
 
 
-def update_chatname(chat_id, new_chat_name ,user_id):
+def update_chatname(chat_id, new_chat_name, user_id):
     try:
-        values = (new_chat_name, chat_id,user_id)
+        values = (new_chat_name, chat_id, user_id)
         # update the chat with the specified chat_id
         update_query = 'UPDATE PDFCHAT.Chat_info SET chat_name = %s WHERE chat_id = %s and user_id = %s'
         runUpdateQuery(update_query, values)
@@ -313,6 +320,7 @@ def get_similar_chunks(data, question):
 
         page_data = [{'page_no': page_no, 'text': text, 'score': emb_similarity_scores[page_no]}
                      for page_no, text in data['text_json'].items() if page_no in relevant_page_nos]
+        print(page_data)
 
         return page_data
 
@@ -320,6 +328,3 @@ def get_similar_chunks(data, question):
         # Handle other potential errors and return False and an error message
         print("An exception occurred:", e)
         return False, {"error": str(e)}
-
-
-

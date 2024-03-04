@@ -12,9 +12,11 @@ backend_base_path = os.getenv('BACKEND_BASE_PATH', 'http://127.0.0.1:5000/')
 def openaiTest():
     return render_template('openai_test.html', params={'username': 'Teja', 'backend_base_path': backend_base_path})
 
+
 @app.route('/login')
 def loginpage():
-    return render_template('loginpage.html',params={'username': 'Teja', 'backend_base_path': backend_base_path})
+    return render_template('loginpage.html', params={'username': 'Teja', 'backend_base_path': backend_base_path})
+
 
 if __name__ == '__main__':
     app.run(port=8080, debug=True)

@@ -1,8 +1,8 @@
 import os
 from flask import Flask, request, jsonify
-from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data,rem_doc
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, rem_doc
 from modules.fileprocess import load_chat_list, del_chat, update_chatname, get_embeddings_of_doc
-from modules.fileprocess import get_similar_chunks,  load_file_list,loginform,signup_form,get_user_info
+from modules.fileprocess import get_similar_chunks,  load_file_list, loginform, signup_form, get_user_info
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -18,7 +18,8 @@ def login():
     password = request.form.get('password')
     login_status, user_id = loginform(username, password)
     if login_status:
-        response = make_response(jsonify({"message": "login successful", "username": username}))
+        response = make_response(
+            jsonify({"message": "login successful", "username": username}))
         session['sid'] = str(uuid.uuid4())
         session['userid'] = user_id
         # Set the cookie
@@ -27,19 +28,19 @@ def login():
     else:
         response = make_response(jsonify({"message": "login failed"}))
         return response, 401
-    
-    
-    
+
+
 def logout():
     # Create a response
     response = make_response(jsonify({"message": "Logged out successfully"}))
-    
+
     # Delete all cookies
     cookies_to_delete = request.cookies.keys()
     for cookie_name in cookies_to_delete:
         response.delete_cookie(cookie_name)
-    
+
     return response, 200
+
 
 def sign_up():
     username = request.form.get('username')
@@ -51,24 +52,24 @@ def sign_up():
         return jsonify({"message": "User created"}), 200
     else:
         return jsonify({"message": message}), 409
-    
-    
-    
+
+
 def get_user_details():
-    b_sid  = request.cookies.get('sid', None)
+    b_sid = request.cookies.get('sid', None)
     s_sid = session.get('sid', None)
     user_id = session['userid']
     if not (b_sid and b_sid == s_sid):
         return jsonify({"error": 'Authorization Error'}), 401
-    username = get_user_info(user_id)   
+    username = get_user_info(user_id)
     if username:
-        return jsonify({"message": "User details found","username":username ,"user_id":user_id}), 200   
+        return jsonify({"message": "User details found", "username": username, "user_id": user_id}), 200
     else:
         return jsonify({"message": "User details not found"}), 404
-    
+
+
 def file_upload():
     try:
-        b_sid  = request.cookies.get('sid', None)
+        b_sid = request.cookies.get('sid', None)
         s_sid = session.get('sid', None)
         user_id = session['userid']
         if not (b_sid and b_sid == s_sid):
@@ -104,7 +105,7 @@ def file_upload():
 
 def list_files():
     try:
-        b_sid  = request.cookies.get('sid', None)
+        b_sid = request.cookies.get('sid', None)
         s_sid = session.get('sid', None)
         user_id = session['userid']
         if not (b_sid and b_sid == s_sid):
@@ -124,7 +125,7 @@ def list_all_chats():
     try:
         # Get the chat_id parameter from the query string
         # chat_id = request.args.get('chat_id')
-        b_sid  = request.cookies.get('sid', None)
+        b_sid = request.cookies.get('sid', None)
         s_sid = session.get('sid', None)
         user_id = session['userid']
         if not (b_sid and b_sid == s_sid):
@@ -149,7 +150,7 @@ def create_chat():
         data = request.get_json()
         file_names = data['fileNames']
 
-        b_sid  = request.cookies.get('sid', None)
+        b_sid = request.cookies.get('sid', None)
         s_sid = session.get('sid', None)
         user_id = session['userid']
         if not (b_sid and b_sid == s_sid):
@@ -168,25 +169,25 @@ def create_chat():
         return jsonify({'error': f'{str(e)}. Files: {", ".join(file_names)}', 'chat_id': None}), 400
 
 
-
 def remove_document(chat_id):
     try:
         pass
     except Exception as e:
-    # Handle other potential errors and return an error message
+        # Handle other potential errors and return an error message
         print("An exception occurred:", e)
         return jsonify({"error": str(e)}), 500
 
+
 def delete_chat(chat_id):
     try:
-        
-        b_sid  = request.cookies.get('sid', None)
+
+        b_sid = request.cookies.get('sid', None)
         s_sid = session.get('sid', None)
         user_id = session['userid']
         if not (b_sid and b_sid == s_sid):
             return jsonify({"error": 'Authorization Error'}), 401
         # Call the del_chat function to delete the chat
-        success, result = del_chat(chat_id,user_id)
+        success, result = del_chat(chat_id, user_id)
 
         if success:
             return jsonify(result)
@@ -203,14 +204,13 @@ def load_chat(chat_id):
     try:
         # Get the chat_id parameter from the query string
         # chat_id = request.args.get('chat_id')
-        
-        
-        b_sid  = request.cookies.get('sid', None)
+
+        b_sid = request.cookies.get('sid', None)
         s_sid = session.get('sid', None)
         user_id = session['userid']
         if not (b_sid and b_sid == s_sid):
             return jsonify({"error": 'Authorization Error'}), 401
-        success, chat_data = load_chat_data(chat_id,user_id)
+        success, chat_data = load_chat_data(chat_id, user_id)
 
         # Check if chat_data retrieval was successful
         if success:
@@ -231,14 +231,14 @@ def update_chat_name():
         data = request.get_json()
         chat_id = data.get('chat_id')
         new_chat_name = data.get('new_chat_name')
-        b_sid  = request.cookies.get('sid', None)
+        b_sid = request.cookies.get('sid', None)
         s_sid = session.get('sid', None)
         user_id = session['userid']
         if not (b_sid and b_sid == s_sid):
             return jsonify({"error": 'Authorization Error'}), 401
 
         # Call the function to update the chat name
-        success, result = update_chatname(chat_id, new_chat_name,user_id)
+        success, result = update_chatname(chat_id, new_chat_name, user_id)
 
         if success:
             return jsonify(result)
@@ -252,19 +252,18 @@ def update_chat_name():
 
 def ask_question(chat_id):
     try:
-        
-        b_sid  = request.cookies.get('sid', None)
+
+        b_sid = request.cookies.get('sid', None)
         s_sid = session.get('sid', None)
         user_id = session['userid']
         if not (b_sid and b_sid == s_sid):
             return jsonify({"error": 'Authorization Error'}), 401
-        
+
         question_text = request.form.get('question')
         if not question_text:
             return jsonify({"error": "Question parameter is missing"}), 400
-        
-        
-        status, data = load_chat_data(chat_id,user_id)
+
+        status, data = load_chat_data(chat_id, user_id)
         # Extract document name from the chat(data)
 
         doc_names = data["documents"]

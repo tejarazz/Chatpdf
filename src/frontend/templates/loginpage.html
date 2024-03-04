@@ -1,6 +1,7 @@
 {% block content %}
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +11,11 @@
 
 </head>
 <style>
-  .login-nav{
-    background-color: rgb( 95, 85, 238 );
+  .login-nav {
+    background-color: rgb(95, 85, 238);
   }
-  .main-color{
+
+  .main-color {
     background-color: #171717;
   }
 </style>
@@ -53,38 +55,38 @@
     </div>
 
     <!-- Signup Form -->
-<div id="signupContainer" class="hidden bg-white mt-16 p-8 rounded-md shadow-lg max-w-full form-container">
-  <h2 class="text-3xl font-semibold mb-4 text-center text-gray-800">Signup</h2>
-  <form id="signupForm" class="space-y-4">
-    <div>
-      <label for="fullname" class="block text-sm font-medium text-gray-600">Username</label>
-      <input type="text" id="fullname" name="fullname"
-        class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
+    <div id="signupContainer" class="hidden bg-white mt-16 p-8 rounded-md shadow-lg max-w-full form-container">
+      <h2 class="text-3xl font-semibold mb-4 text-center text-gray-800">Signup</h2>
+      <form id="signupForm" class="space-y-4">
+        <div>
+          <label for="fullname" class="block text-sm font-medium text-gray-600">Username</label>
+          <input type="text" id="fullname" name="fullname"
+            class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
+        </div>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
+          <input type="email" id="email" name="email"
+            class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
+        </div>
+        <div>
+          <label for="signup_password" class="block text-sm font-medium text-gray-600">Password</label>
+          <input type="password" id="signup_password" name="password"
+            class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
+        </div>
+        <div>
+          <label for="confirm_password" class="block text-sm font-medium text-gray-600">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password"
+            class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
+        </div>
+        <button type="submit"
+          class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:border-green-300">Signup</button>
+      </form>
+      <div id="signupMessage" class="mt-4 text-center"></div>
+      <div class="mt-4 text-center">
+        <p class="text-gray-600">Already have an account? </p>
+        <a href="#" class="text-blue-500 hover:underline" onclick="toggleForm('loginContainer')">Login here</a>
+      </div>
     </div>
-    <div>
-      <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
-      <input type="email" id="email" name="email"
-        class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
-    </div>
-    <div>
-      <label for="signup_password" class="block text-sm font-medium text-gray-600">Password</label>
-      <input type="password" id="signup_password" name="password"
-        class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
-    </div>
-    <div>
-      <label for="confirm_password" class="block text-sm font-medium text-gray-600">Confirm Password</label>
-      <input type="password" id="confirm_password" name="confirm_password"
-        class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
-    </div>
-    <button type="submit"
-      class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:border-green-300">Signup</button>
-  </form>
-  <div id="signupMessage" class="mt-4 text-center"></div>
-  <div class="mt-4 text-center">
-    <p class="text-gray-600">Already have an account? </p>
-    <a href="#" class="text-blue-500 hover:underline" onclick="toggleForm('loginContainer')">Login here</a>
-  </div>
-</div>
     <script>
 
       document.addEventListener("DOMContentLoaded", function () {
@@ -93,33 +95,33 @@
           var username = document.getElementById("username").value;
           var password = document.getElementById("password").value;
           var loginMessage = document.getElementById("loginMessage");
-      
+
           // Send POST request to Flask backend
-          fetch("{{ params['backend_base_path'] }}"+'login', {
+          fetch("{{ params['backend_base_path'] }}" + 'login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password)
           })
-          .then(response => {
-            if (response.ok) {
-              return response.json();
-            } else {
-              throw new Error('Login failed');
-            }
-          })
-          .then(data => {
-            // Handle successful login
-            loginMessage.textContent = "";
-            window.location.href = `/`;
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('Login failed');
+              }
+            })
+            .then(data => {
+              // Handle successful login
+              loginMessage.textContent = "";
+              window.location.href = `/`;
 
 
-          })
-          .catch(error => {
-            // Handle login error
-            loginMessage.textContent = error.message;
-          });
+            })
+            .catch(error => {
+              // Handle login error
+              loginMessage.textContent = error.message;
+            });
         });
       });
 
@@ -132,78 +134,78 @@
           var confirmPassword = document.getElementById("confirm_password").value.trim();
           var email = document.getElementById("email").value.trim();
           var signupMessage = document.getElementById("signupMessage");
-      
+
           // Validate username format and length
           if (!signupUsername || !/^[a-zA-Z0-9]+$/.test(signupUsername) || signupUsername.length < 6 || signupUsername.length > 20) {
             signupMessage.textContent = "Username must contain only alphanumeric characters (a-z, A-Z, 0-9) and be between 6 to 20 characters.";
             return;
           }
-      
+
           // Validate password length
           if (!signupPassword || signupPassword.length < 8 || signupPassword.length > 20) {
             signupMessage.textContent = "Password must be between 8 to 20 characters.";
             return;
           }
-      
+
           // Validate email format
           var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (!emailPattern.test(email)) {
             signupMessage.textContent = "Please enter a valid email address.";
             return;
           }
-      
+
           // Validate password and confirm password match
           if (signupPassword !== confirmPassword) {
             signupMessage.textContent = "Passwords do not match.";
             return;
           }
-      
+
           // Send POST request to backend (replace URL with actual endpoint)
-          fetch("{{ params['backend_base_path'] }}"+'sign_up', {
+          fetch("{{ params['backend_base_path'] }}" + 'sign_up', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: 'username=' + encodeURIComponent(signupUsername) + '&password=' + encodeURIComponent(signupPassword)+ '&email=' + encodeURIComponent(email)
+            body: 'username=' + encodeURIComponent(signupUsername) + '&password=' + encodeURIComponent(signupPassword) + '&email=' + encodeURIComponent(email)
           })
-          .then(response => {
-            if (response.ok) {
-              return response.json().then(data => {
-                // Handle successful signup
-                signupMessage.textContent = data.message;
-                window.location.href = `/`;
-              });
-            } else {
-              return response.json().then(errorData => {
-                // Handle signup error
-                throw new Error(errorData.message);
-              });
-            }
-          })
-          .then(data => {
-            // Handle successful signup
-          })
-          .catch(error => {
-            // Handle signup error
-            signupMessage.textContent = error.message;
-          });
+            .then(response => {
+              if (response.ok) {
+                return response.json().then(data => {
+                  // Handle successful signup
+                  signupMessage.textContent = data.message;
+                  window.location.href = `/`;
+                });
+              } else {
+                return response.json().then(errorData => {
+                  // Handle signup error
+                  throw new Error(errorData.message);
+                });
+              }
+            })
+            .then(data => {
+              // Handle successful signup
+            })
+            .catch(error => {
+              // Handle signup error
+              signupMessage.textContent = error.message;
+            });
         });
       });
 
       function toggleForm(activeFormId) {
         const loginContainer = document.getElementById('loginContainer');
         const signupContainer = document.getElementById('signupContainer');
-        
+
         const scaleDown = (element) => {
           element.style.transform = 'scale(0)';
           element.style.transition = 'transform 1s ease-in-out';
         };
-        
+
         const scaleUp = (element) => {
           element.style.transform = 'scale(1)';
           element.style.transition = 'transform 1s ease-in-out';
         };
-        
+
         if (activeFormId === 'loginContainer') {
           scaleDown(signupContainer);
           setTimeout(() => {
@@ -221,7 +223,7 @@
         }
       }
 
-    
+
     </script>
 </body>
 
