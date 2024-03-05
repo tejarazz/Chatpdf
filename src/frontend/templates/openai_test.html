@@ -450,7 +450,7 @@ content %}
               var lines = content.split("\n").map((line) => {
                 var parts = line.split(":");
                 if (parts.length > 1) {
-                  parts[0] = `<span class="font-semibold text-md">${parts[0]}</span>`;
+                  parts[0] = `<span class="font-bold text-md">${parts[0]}</span>`;
                 }
                 return parts.join(":").replace(/`/g, "");
               });
@@ -715,7 +715,7 @@ content %}
             var lines = content.split("\n").map((line) => {
               var parts = line.split(":");
               if (parts.length > 1) {
-                parts[0] = `<span class="font-semibold text-md">${parts[0]}</span>`;
+                parts[0] = `<span class="font-bold text-md">${parts[0]}</span>`;
               }
               return parts.join(":").replace(/`/g, "");
             });
