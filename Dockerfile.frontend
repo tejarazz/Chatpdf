@@ -23,12 +23,12 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
 
 RUN pip install --upgrade pip
 
-COPY requirements_backend.txt .
+COPY requirements_frontend.txt .
 
-RUN pip install -r requirements_backend.txt
+RUN pip install -r requirements_frontend.txt
 
-COPY ./src/backend .
+COPY ./src/frontend .
 
-EXPOSE 5000
+EXPOSE 8080
 
-CMD ["flask", "run"]
+CMD ["python", "app.py"]
