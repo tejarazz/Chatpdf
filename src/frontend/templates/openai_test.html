@@ -1,55 +1,68 @@
 {% extends 'base.html' %} {% block title %} ChatBot {% endblock %} {% block
 content %}
 
-<nav class="bg-purple-700 py-3 w-full shadow-lg text-white flex md:justify-start justify-center">
+<nav class="navbar h-12 w-full shadow-lg text-white flex md:justify-start justify-center">
   <div class="flex items-center justify-between w-full">
-    <div class="pl-6">
-      <a class=" md:text-md font-sans text-xl w-full text-white text-left font-bold" href="/">TextMateAI</a>
-      <i class="fas fa-comment ml-1 text-white text-xl"></i>
+    <div class="pl-4 flex">
+      <img class="h-6 w-6 mr-2" src="https://cdn-icons-png.flaticon.com/512/12122/12122368.png">
+      <a class="name md:text-md font-sans text-md w-full text-white text-left font-bold">TextMateAI</a>
     </div>
-    <a class="pr-10 font-semibold hover:text-purple-300" href="#">Login</a>
+    <a id="loginLink" class="pr-10 font-semibold text-white hover:text-gray-300" style="display: none"
+      href="login">Login</a>
   </div>
 </nav>
 <!-- Main Section -->
-<div class="main-section flex flex-col  md:flex-row h-full">
+<div class="main-section flex flex-col md:flex-row">
   <!-- Section 1: Categories -->
-  <div class="section1 order-3 md:order-1 flex flex-col md:w-2/12 h-full pt-4">
-
+  <div class="section1 order-3 md:order-1 text-white shadow-lg flex flex-col md:w-2/12 h-full">
     <div id="chatTitle"
-      class="flex justify-center items-center shadow-lg m-4 mt-2 p-3 font-medium text-xs bg-purple-800 text-white rounded-md h-12 overflow-hidden">
+      class="flex justify-left items-center font-medium px-4 border-b border-gray-800 text-xs h-12 overflow-hidden">
       Chat Title
     </div>
 
-    <div class="p-2 text-gray-800 font-bold text-xs mx-4">
-      Previous Chats
-    </div>
-    <div id="chatListSection"
-      class="simplebar items-center  mx-4 mt-1 p-2 bg-purple-800 text-white shadow-lg rounded-md overflow-auto">
+    <div class="pc text-gray-400 pl-4 mt-4 h-6">Chats History</div>
+    <div id="chatListSection" class="simplebar items-center px-2 overflow-auto">
       <!-- Content will be dynamically added here -->
+    </div>
+
+    <!-- User Profile -->
+    <div class="relative mt-auto dropdown" id="profileSection" style="display: none">
+      <div class="flex items-center justify-start px-4 border-t border-gray-800 text-sm h-12 overflow-hidden"
+        onmouseover="showDropdown()" onmouseout="hideDropdown()">
+        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+          alt="Profile Image" class="h-6 w-6 rounded-full mr-2" />
+        <span id="username" class="font-bold text-md">Username</span>
+      </div>
+      <div class="dropdown-content " id="dropdownContent" onmouseover="showDropdown()" onmouseout="hideDropdown()">
+        <a href="#" onclick="logout()"
+          class="block w-full text-white  font-semibold py-2 px-4  hover:bg-gray-600 focus:outline-none focus:border-blue-500">Logout</a>
+        <a href="#" onclick="viewProfile()"
+          class="block w-full text-white  font-semibold py-2 px-4  hover:bg-gray-600 focus:outline-none focus:border-blue-500">Profile</a>
+      </div>
     </div>
   </div>
 
   <!-- Section 2: Chat Area -->
-  <div class="section-2 order-2 md:order-2 w-full md:w-8/12 h-full mt-6 md:mx-0 mx-2 p-6 bg-white rounded-md shadow-lg">
+  <div class="section2 order-2 md:order-2 px-4 pt-2 pb-6 w-full  md:w-8/12 h-full">
     <div class="" id="scrollContainer">
       <!-- Answer Container -->
-      <div id="answerContainer" class="p-4 m-1 bg-white rounded-sm">
-        <p id="answerContent" class="text-black font-sans gap-4 flex flex-col"></p>
+      <div id="answerContainer" class="px-4 h-full rounded-sm">
+        <p id="answerContent" class="text-white font-sans gap-4 flex flex-col"></p>
       </div>
-
     </div>
 
     <!-- User Input Form -->
-    <form onsubmit="return getAnswer()" class="mt-4">
+    <form onsubmit="return getAnswer()" class="m-4 relative">
       <!-- Input and Buttons -->
-      <div class="flex flex-col md:flex-row items-center">
+      <div class="flex flex-col md:flex-row items-center relative">
         <div class="relative flex-grow flex items-center">
           <div class="relative w-full flex">
-            <textarea class="form-input p-3 md:w-full w-96 font-semibold rounded-md border-2 outline-none resize-none"
+            <textarea
+              class="form-input p-3 md:w-full w-96 font-semibold z-20 text-white rounded-lg border border-gray-700 outline-none resize-none"
               placeholder="Ask a Question" id="questionTextarea" name="question" rows="1" oninput="toggleButton()"
               onkeydown="handleKeyDown(event)"></textarea>
             <button
-              class="border-2 bg-gray-500 py-2 px-3 rounded-lg md:rounded-md transition-colors absolute right-4 top-1/2 transform -translate-y-1/2 z-20"
+              class="bg-gray-500 py-2 px-3 rounded-lg md:rounded-md transition-colors absolute right-3 top-1/2 transform -translate-y-1/2 z-20"
               type="button" onclick="getAnswer()" id="submitButton" disabled>
               <div class="flex items-center justify-center">
                 <i class="fas fa-arrow-up text-white" id="arrowIcon"></i>
@@ -62,13 +75,12 @@ content %}
         </div>
       </div>
     </form>
-
   </div>
 
   <!-- Section 3: File and Chat List -->
-  <div class="section3 order-1 md:order-3 flex flex-col md:w-2/12 pt-4 h-full">
+  <div class="section3 order-1 md:order-3 text-white shadow-lg flex flex-col md:w-2/12 h-full">
     <!-- Chat List -->
-    <div class="flex flex-col m-4 mt-2 h-48 border border-black text-white rounded-md bg-purple-800">
+    <div class="flex flex-col  pt-6 h-52">
       <h6 class="flex font-bold justify-center">Chat with</h6>
       <div id="pdfList" class="sitems flex flex-col py-2">
         <!-- PDF names will be dynamically added here -->
@@ -77,7 +89,7 @@ content %}
     <!-- File Upload Form -->
     <form id="uploadForm" enctype="multipart/form-data">
       <label for="fileInput"
-        class="relative flex items-center shadow-lg justify-center text-white font-bold px-4 py-2 rounded-md mx-4 my-4 transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800 cursor-pointer">
+        class="upload relative flex items-center shadow-lg justify-center text-md font-bold px-2 mx-4 py-1 rounded-md mt-8 text-white cursor-pointer">
         <span id="uploadText">
           <!-- Font Awesome upload icon -->
           <i class="fas fa-upload mr-1"></i>
@@ -85,14 +97,13 @@ content %}
         </span>
         <span id="uploadSpinner" class="absolute inset-0 flex items-center justify-center opacity-0">
           <!-- Tailwind CSS spinner -->
-          <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-r-2 border-b-2 border-blue-500"></div>
+          <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-r-2 border-b-2 border-white"></div>
         </span>
       </label>
       <input type="file" id="fileInput" name="file" accept=".pdf" style="display: none" />
     </form>
     <!-- Browse and Select Button -->
-    <button
-      class="text-white shadow-lg font-bold px-4 py-2 mx-4 mt-4 rounded-md transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800"
+    <button class="browse shadow-lg font-bold px-2 py-1 text-md mx-4 mt-8 rounded-md text-white"
       onclick="toggleModal()">
       <i class="fas fa-folder-open mr-1"></i>
       Browse and Select
@@ -102,12 +113,12 @@ content %}
     <div id="pdfList"></div>
 
     <!-- Modal for File Selection -->
-    <div id="myModal" class="fixed inset-0 z-50 overflow-auto hidden bg-black bg-opacity-50">
+    <div id="myModal" class="fixed inset-0 z-50 overflow-auto hidden bg-gray-700 bg-opacity-50">
       <!-- Modal Content -->
       <div class="modal-dialog flex items-center justify-center min-h-screen">
-        <div class="modal-content bg-white w-3/6 mx-auto p-6 rounded-lg shadow-lg">
+        <div class="modal-content bg-gray-800 w-3/6 mx-auto p-6 rounded-lg shadow-lg">
           <!-- Modal Header -->
-          <div class="modal-header border-b pb-4 flex justify-between items-center">
+          <div class="modal-header border-b border-gray-600 pb-4 flex justify-between items-center">
             <h4 class="modal-title text-xl font-semibold">Choose a File</h4>
             <button type="button" class="btn-close text-4xl" onclick="toggleModal()">
               &times;
@@ -118,14 +129,16 @@ content %}
           <div class="modal-body py-4">
             <!-- Search box with clickable search button -->
             <div class="mb-4 flex items-center">
-              <input type="text" id="searchInput" class="form-input p-3 border outline-none flex-grow"
-                placeholder="Enter File Name" />
+              <input type="text" id="searchInput"
+                class="form-input rounded-l-md p-3 border border-gray-600 outline-none flex-grow"
+                placeholder="Enter File Name">
               <button
-                class="btn btn-primary p-3 transition duration-300 ease-in-out hover:bg-purple-700 bg-purple-800 rounded-tr-lg rounded-br-lg focus:outline-none focus:shadow-outline-blue"
+                class="btn btn-primary p-3 transition duration-300 ease-in-out hover:bg-purple-500 bg-purple-600 rounded-r-md outline-none focus:shadow-outline-blue"
                 type="button" id="searchButton">
                 <i class="fas fa-search text-white"></i>
               </button>
             </div>
+
 
             <!-- Scrollable checkbox list of files -->
             <div class="file-list overflow-auto max-h-48" id="fileList">
@@ -150,15 +163,9 @@ content %}
           </div>
 
           <!-- Modal footer -->
-          <div class="modal-footer py-4 border-t flex justify-end">
-            <!-- Add two buttons at the bottom right corners -->
-            <!-- <button type="button"
-              class="bg-purple-800 border-2 transition duration-300 ease-in-out hover:bg-purple-700 text-white font-medium px-6 mr-2 md:px-4 py-3 rounded-lg"
-              onclick="createChat('checked_file_path', 'existing_chat')">
-              Existing Chat
-            </button> -->
+          <div class="modal-footer py-4 border-t border-gray-600 flex justify-end">
             <button type="button"
-              class="bg-purple-800 border-2 transition duration-300 ease-in-out hover:bg-purple-700 text-white font-medium px-6 md:px-4 py-3 rounded-lg"
+              class="bg-purple-600 transition duration-300 ease-in-out hover:bg-purple-500 text-white font-medium px-6 md:px-4 py-3 rounded-lg"
               onclick="createChat('fileInput', 'new_chat')">
               New Chat
             </button>
@@ -179,14 +186,15 @@ content %}
   // Ensure the DOM is fully loaded before executing the code
   document.addEventListener("DOMContentLoaded", function () {
     // Attach event listener to file input for changes
-    const scrollContainer = document.getElementById('scrollContainer');
+    const scrollContainer = document.getElementById("scrollContainer");
     new SimpleBar(scrollContainer);
 
     // Get the current URL
     var url = new URL(window.location.href);
 
-    document.getElementById("fileInput").addEventListener("change", updatePdfList);
-
+    document
+      .getElementById("fileInput")
+      .addEventListener("change", updatePdfList);
 
     // Call loadChat to initiate the process
     loadChat();
@@ -197,6 +205,80 @@ content %}
     // Call initializeForm to set the initial state of the form
     initializeForm();
   });
+
+  // Get the value of the 'sid' cookie
+  function getSidCookie() {
+    var cookies = document.cookie.split(";");
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i].trim();
+      if (cookie.indexOf("sid=") === 0) {
+        return cookie.substring(4); // Length of 'sid='
+      }
+    }
+    return "";
+  }
+
+  // Hide or show profile section and login link based on session
+  function updateUI() {
+    var sid = getSidCookie();
+    var profileSection = document.getElementById("profileSection");
+    var loginLink = document.getElementById("loginLink");
+
+    if (sid && profileSection && loginLink) {
+      profileSection.style.display = "block";
+      loginLink.style.display = "none";
+    } else if (profileSection && loginLink) {
+      profileSection.style.display = "none";
+      loginLink.style.display = "inline-block";
+    }
+  }
+
+  // Call updateUI when the page loads
+  window.onload = function () {
+    updateUI();
+  };
+
+  var dropdownTimeout;
+
+  function showDropdown() {
+    clearTimeout(dropdownTimeout);
+    var dropdown = document.getElementById("dropdownContent");
+    dropdown.style.display = "block";
+  }
+
+  function hideDropdown() {
+    dropdownTimeout = setTimeout(function () {
+      var dropdown = document.getElementById("dropdownContent");
+      dropdown.style.display = "none";
+    }, 300); // Delay hiding dropdown on mouseout to prevent flickering
+  }
+
+  function logout() {
+    // Send a request to the backend to perform logout actions
+    fetch("{{ params['backend_base_path'] }}" + "logout", {
+      method: "GET", // or 'GET' depending on your backend setup
+      credentials: "same-origin", // Include cookies in the request
+    })
+      .then((response) => {
+        if (response.ok) {
+          // If logout is successful, redirect to login page
+          window.location.href = "https://chatpdf.xyz";
+        } else {
+          // Handle error response
+          console.error("Logout failed:", response.statusText);
+          // Optionally, display an error message to the user
+        }
+      })
+      .catch((error) => {
+        // Handle network errors
+        console.error("Network error during logout:", error);
+        // Optionally, display an error message to the user
+      });
+  }
+
+  function viewProfile() {
+    // Your view profile logic here
+  }
 
   // Function to toggle the visibility of the modal
   function toggleModal() {
@@ -236,7 +318,10 @@ content %}
     textarea.style.overflowY = scrollHeight > maxHeight ? "auto" : "hidden";
 
     // Reset height to default if the textarea is empty
-    textarea.style.height = textarea.value.trim() === "" ? "" : Math.min(scrollHeight, maxHeight) + "px";
+    textarea.style.height =
+      textarea.value.trim() === ""
+        ? ""
+        : Math.min(scrollHeight, maxHeight) + "px";
   }
 
   // Add an event listener to handle changes in textarea value
@@ -246,7 +331,7 @@ content %}
   });
 
   function handleKeyDown(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault(); // Prevents adding a newline
       getAnswer(); // Call your form submission function
     }
@@ -280,20 +365,30 @@ content %}
     var answerContainer = document.getElementById("answerContainer");
     var answerContent = document.getElementById("answerContent");
     var scrollContainer = document.getElementById("scrollContainer");
-    // const chatListSection = document.getElementById('chatListSection');
-    // console.log(chatListSection);
+    var chatTitle = document.getElementById("chatTitle");
+
+    // Function to remove trailing dot from a string
+    function removeTrailingDot(str) {
+      return str.endsWith(".") ? str.slice(0, -1) : str;
+    }
+
+    // Function to remove stars from a string
+    function removeStars(str) {
+      return str.replace(/\*/g, ""); // Using a regular expression to globally replace stars
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const chatId = urlParams.get("chat_id");
     var chat_name_entity = document.getElementById(`chat_container_${chatId}`);
-    console.log(chat_name_entity);
+
     if (!chatId) {
       Swal.fire({
-        icon: 'warning',
-        title: 'Oops!',
-        text: 'Please upload a PDF to ask a question.',
+        icon: "warning",
+        title: "Oops!",
+        text: "Please upload a PDF to ask a question.",
         showCancelButton: false,
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#3085d6',
+        confirmButtonText: "OK",
+        confirmButtonColor: "#3085d6",
       });
       return false;
     }
@@ -325,42 +420,49 @@ content %}
         console.log("Server Response:", response);
 
         var partconv = response.conversation;
-        var chatTitle = document.getElementById("chatTitle");
 
-        const nameDiv = chat_name_entity.querySelector('.relative > button > div');
-        nameDiv.textContent = response.chat_name;
+        // Update chat title with chat_name from the server
         chatTitle.innerHTML = removeTrailingDot(response.chat_name) || "Chat Title";
-        chatTitle.classList.add('text-xs');
-        var conversationHTML = partconv.map((point) => {
-          var content = point.content;
+        chatTitle.classList.add("text-xs");
 
-          // Check if content contains code block
-          if (/^```html[\s\S]+```$/.test(content)) {
-            // Extract HTML code content between backticks
-            var codeContent = content.replace(/^```html|```$/g, '');
-            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre class="language-html">${Prism.highlight(codeContent, Prism.languages.html, 'html')}</pre></div>`;
-          } else if (/^```[^`]+```$/.test(content)) {
-            // Extract code content between backticks and format for other languages
-            var codeContent = content.replace(/^```|```$/g, '');
-            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre>${Prism.highlight(codeContent, Prism.languages.auto, 'auto')}</pre></div>`;
-          } else {
-            // Split content into lines and remove backticks
-            var lines = content.split('\n').map(line => {
-              var parts = line.split(':');
-              if (parts.length > 1) {
-                parts[0] = `<span class="font-semibold text-md">${parts[0]}</span>`;
-              }
-              return parts.join(':').replace(/`/g, '');
-            });
+        var conversationHTML = partconv
+          .map((point) => {
+            var content = point.content;
 
-            var formattedContent = lines.join('<br>');
+            // Remove stars from content
+            content = removeStars(content);
 
-            return `<div class="border rounded-sm p-2 font-sans text-sm border-gray-300 bg-gray-100"><p class="font-bold capitalize font-sans  text-sm">${point.role}:</p> ${formattedContent}</div>`;
-          }
-        }).join("");
+            // Check if content contains code block
+            if (/^```html[\s\S]+```$/.test(content)) {
+              // Extract HTML code content between backticks
+              var codeContent = content.replace(/^```html|```$/g, "");
+              return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre class="language-html">${Prism.highlight(
+                codeContent,
+                Prism.languages.html,
+                "html"
+              )}</pre></div>`;
+            } else if (/^```[^`]+```$/.test(content)) {
+              // Extract code content between backticks and format for other languages
+              var codeContent = content.replace(/^```|```$/g, "");
+              return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre>${codeContent}</pre></div>`;
+            } else {
+              // Split content into lines and remove backticks
+              var lines = content.split("\n").map((line) => {
+                var parts = line.split(":");
+                if (parts.length > 1) {
+                  parts[0] = `<span class="font-bold text-md">${parts[0]}</span>`;
+                }
+                return parts.join(":").replace(/`/g, "");
+              });
+
+              var formattedContent = lines.join("<br>");
+
+              return `<div class="rounded-sm p-4 font-sans text-sm rounded-md bg-black"><p class="font-bold text-gray-400 capitalize font-sans text-sm">${point.role}:</p> ${formattedContent}</div>`;
+            }
+          })
+          .join("");
 
         answerContent.innerHTML += conversationHTML;
-
         answerContent.lastElementChild.scrollIntoView({ behavior: "smooth" });
 
         answerContainer.style.display = "block";
@@ -372,6 +474,10 @@ content %}
         arrowIcon.style.visibility = "visible";
         submitButton.style.backgroundColor = "gray";
         submitButton.style.cursor = "default";
+      })
+      .catch((error) => {
+        console.error("Error fetching answer:", error);
+        // Handle error if needed
       });
 
     questionInput.value = "";
@@ -399,10 +505,13 @@ content %}
         uploadSpinner.style.opacity = "1";
 
         // Use fetch API to upload files to the server
-        const response = await fetch("{{ params['backend_base_path'] }}" + "file-upload", {
-          method: "POST",
-          body: formData,
-        });
+        const response = await fetch(
+          "{{ params['backend_base_path'] }}" + "file-upload",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -426,9 +535,12 @@ content %}
   // Function to asynchronously fetch the list of files from the server
   async function fetchFileList() {
     try {
-      const response = await fetch("{{ params['backend_base_path'] }}" + "list-files", {
-        method: "GET",
-      });
+      const response = await fetch(
+        "{{ params['backend_base_path'] }}" + "list-files",
+        {
+          method: "GET",
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -448,45 +560,49 @@ content %}
     // Clear existing file items
     fileContainer.getContentElement().innerHTML = "";
 
-    fileList.forEach(({ file_name: fileName, file_path, file_size, last_modified }) => {
-      const fileItem = document.createElement("div");
-      fileItem.classList.add(
-        "mb-3",
-        "mr-3",
-        "border",
-        "p-3",
-        "file-item",
-        "flex",
-        "items-center",
-        "hover:bg-gray-200",
-        "select-none"
-      );
+    fileList.forEach(
+      ({ file_name: fileName, file_path, file_size, last_modified }) => {
+        const fileItem = document.createElement("div");
+        fileItem.classList.add(
+          "mb-3",
+          "mr-3",
+          "border",
+          "border-gray-600",
+          "p-3",
+          "file-item",
+          "rounded-md",
+          "flex",
+          "items-center",
+          "hover:bg-gray-500",
+          "select-none"
+        );
 
-      const checkbox = document.createElement("input");
-      checkbox.classList.add("form-check-input", "mr-3", "file-checkbox");
-      checkbox.type = "checkbox";
-      checkbox.value = file_path; // Use file_path as the value for the checkbox
-      checkbox.id = `checkbox_${fileName}`;
-      checkbox.checked = false;
+        const checkbox = document.createElement("input");
+        checkbox.classList.add("form-check-input", "mr-3", "file-checkbox");
+        checkbox.type = "checkbox";
+        checkbox.value = file_path; // Use file_path as the value for the checkbox
+        checkbox.id = `checkbox_${fileName}`;
+        checkbox.checked = false;
 
-      const label = document.createElement("label");
-      label.classList.add("form-check-label");
-      label.htmlFor = `checkbox_${fileName}`;
-      label.textContent = fileName;
-      label.style.width = "100%"; // Set the label width to 100%
+        const label = document.createElement("label");
+        label.classList.add("form-check-label");
+        label.htmlFor = `checkbox_${fileName}`;
+        label.textContent = fileName;
+        label.style.width = "100%"; // Set the label width to 100%
 
-      // Append the checkbox and label to the file item
-      fileItem.appendChild(checkbox);
-      fileItem.appendChild(label);
+        // Append the checkbox and label to the file item
+        fileItem.appendChild(checkbox);
+        fileItem.appendChild(label);
 
-      // Append the file item to the file container
-      fileContainer.getContentElement().appendChild(fileItem);
-    });
+        // Append the file item to the file container
+        fileContainer.getContentElement().appendChild(fileItem);
+      }
+    );
   }
 
   // Function to remove trailing dot from a string
   function removeTrailingDot(str) {
-    return str.endsWith('.') ? str.slice(0, -1) : str;
+    return str.endsWith(".") ? str.slice(0, -1) : str;
   }
 
   // Function to update PDF list with chat data
@@ -504,27 +620,8 @@ content %}
         // Remove trailing dot from the documentName
         const cleanedDocumentName = removeTrailingDot(documentName);
 
-        // Create a container div for the label
-        const container = document.createElement("div");
-        container.classList.add(
-          "text-xs",
-          "text-black",
-          "font-medium",
-          "bg-white",
-          "rounded-sm",
-          "p-2",
-          "mx-2",
-          "overflow-hidden",
-          "whitespace-nowrap",
-          "text-center"
-        );
-
-        // Create the label element
-        const label = document.createElement("label");
-        label.textContent = cleanedDocumentName;
-
-        // Append the label to the container
-        container.appendChild(label);
+        // Create a container div for the label and remove button
+        const container = createDocumentContainer(cleanedDocumentName);
 
         // Append the container to the PDF list
         pdfListElement.appendChild(container);
@@ -535,6 +632,35 @@ content %}
     }
   }
 
+  // Function to create a container for a document with label and remove button
+  function createDocumentContainer(documentName) {
+    // Create the container div
+    const container = document.createElement("div");
+    container.classList.add(
+      "text-xs",
+      "text-white",
+      "font-medium",
+      "rounded-md",
+      "p-2",
+      "mx-4",
+      "overflow-hidden",
+      "whitespace-nowrap",
+      "flex",
+      "justify-around",
+      "shadow-lg"
+    );
+    container.style.backgroundColor = "#1777ff";
+
+    // Create the label element
+    const label = document.createElement("label");
+    label.textContent = documentName;
+
+    // Append the label and remove button to the container
+    container.appendChild(label);
+
+    return container;
+  }
+
   function updateconversation(data) {
     var chatTitle = document.getElementById("chatTitle");
     var answerContainer = document.getElementById("answerContainer");
@@ -542,14 +668,19 @@ content %}
 
     // Function to remove trailing dot from a string
     function removeTrailingDot(str) {
-      return str.endsWith('.') ? str.slice(0, -1) : str;
+      return str.endsWith(".") ? str.slice(0, -1) : str;
+    }
+
+    // Function to remove stars from a string
+    function removeStars(str) {
+      return str.replace(/\*/g, ""); // Using a regular expression to globally replace stars
     }
 
     // Check if there is no conversation data
     if (data.conversation.length === 0) {
       // If chat_name is available, use it; otherwise, set a default title
       chatTitle.innerHTML = removeTrailingDot(data.chat_name) || "Chat Title";
-      chatTitle.classList.add('text-xs'); // Set the size to medium
+      chatTitle.classList.add("text-xs"); // Set the size to medium
 
       // Clear the answer content
       answerContent.innerHTML = "";
@@ -557,36 +688,44 @@ content %}
     } else {
       // Update chat title with chat_name from the server
       chatTitle.innerHTML = removeTrailingDot(data.chat_name) || "Chat Title";
-      chatTitle.classList.add('text-xs');
+      chatTitle.classList.add("text-xs");
 
       // Update conversation in the UI
-      var conversationHTML = data.conversation.map((point) => {
-        var content = point.content;
+      var conversationHTML = data.conversation
+        .map((point) => {
+          var content = point.content;
+          // Remove stars from content
+          content = removeStars(content);
 
-        // Check if content contains code block
-        if (/^```html[\s\S]+```$/.test(content)) {
-          // Extract HTML code content between backticks
-          var codeContent = content.replace(/^```html|```$/g, '');
-          return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre class="language-html">${Prism.highlight(codeContent, Prism.languages.html, 'html')}</pre></div>`;
-        } else if (/^```[^`]+```$/.test(content)) {
-          // Extract code content between backticks and format for other languages
-          var codeContent = content.replace(/^```|```$/g, '');
-          return `<div class="border rounded-md p-1  border-gray-300 bg-gray-100"><pre>${Prism.highlight(codeContent, Prism.languages.auto, 'auto')}</pre></div>`;
-        } else {
-          // Split content into lines and remove backticks
-          var lines = content.split('\n').map(line => {
-            var parts = line.split(':');
-            if (parts.length > 1) {
-              parts[0] = `<span class="font-semibold text-md">${parts[0]}</span>`;
-            }
-            return parts.join(':').replace(/`/g, '');
-          });
+          // Check if content contains code block
+          if (/^```html[\s\S]+```$/.test(content)) {
+            // Extract HTML code content between backticks
+            var codeContent = content.replace(/^```html|```$/g, "");
+            return `<div class="border rounded-md p-1 border-gray-300 bg-gray-100"><pre class="language-html">${Prism.highlight(
+              codeContent,
+              Prism.languages.html,
+              "html"
+            )}</pre></div>`;
+          } else if (/^```[^`]+```$/.test(content)) {
+            // Extract code content between backticks and format for other languages
+            var codeContent = content.replace(/^```|```$/g, "");
+            return `<div class="border rounded-md p-1  border-gray-300 bg-gray-100"><pre>${codeContent}</pre></div>`;
+          } else {
+            // Split content into lines and remove backticks
+            var lines = content.split("\n").map((line) => {
+              var parts = line.split(":");
+              if (parts.length > 1) {
+                parts[0] = `<span class="font-bold text-md">${parts[0]}</span>`;
+              }
+              return parts.join(":").replace(/`/g, "");
+            });
 
-          var formattedContent = lines.join('<br>');
+            var formattedContent = lines.join("<br>");
 
-          return `<div class="border rounded-sm p-2 font-sans text-sm border-gray-300 bg-gray-100"><p class="font-bold capitalize font-sans  text-sm">${point.role}:</p> ${formattedContent}</div>`;
-        }
-      }).join("");
+            return `<div class="rounded-sm p-4 font-sans text-sm rounded-md bg-black"><p class="font-bold text-gray-400 capitalize font-sans text-sm">${point.role}:</p> ${formattedContent}</div>`;
+          }
+        })
+        .join("");
 
       answerContent.innerHTML = conversationHTML;
       answerContainer.style.display = "block";
@@ -662,9 +801,9 @@ content %}
     } else {
       // Display error message using SweetAlert for no file selected
       Swal.fire({
-        icon: 'error',
-        title: 'No File Selected',
-        text: 'Please select a file before creating a chat.',
+        icon: "error",
+        title: "No File Selected",
+        text: "Please select a file before creating a chat.",
       });
     }
   }
@@ -762,16 +901,19 @@ content %}
 
   async function get_chat_list() {
     try {
-      const response = await fetch("{{ params['backend_base_path'] }}" + 'list-all-chats');
+      const response = await fetch(
+        "{{ params['backend_base_path'] }}" + "list-all-chats"
+      );
       const data = await response.json();
 
       if (response.ok) {
         displayChatList(data);
       } else {
-        console.error('Failed to fetch chat list:', data);
+        console.error("Failed to fetch chat list:", data);
+        window.location.href = 'https://chatpdf.xyz/login';
       }
     } catch (error) {
-      console.error('Error fetching chat list:', error);
+      console.error("Error fetching chat list:", error);
     }
   }
 
@@ -782,16 +924,19 @@ content %}
 
   async function removeChat(chat_id, chatContainer) {
     try {
-      const response = await fetch("{{ params['backend_base_path'] }}" + `delete-chat/${chat_id}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        "{{ params['backend_base_path'] }}" + `delete-chat/${chat_id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         const data = await response.json();
-        console.error('Failed to remove chat:', data);
+        console.error("Failed to remove chat:", data);
       }
     } catch (error) {
-      console.error('Error removing chat:', error);
+      console.error("Error removing chat:", error);
     } finally {
       // Remove the chat container from the UI
       chatContainer.remove();
@@ -800,82 +945,155 @@ content %}
 
   function prepareChatNameEntity(chat, chatContainer) {
     chatContainer.classList.add(
-      'flex', 'flex-col', 'bg-transparent', 'rounded', 'w-full', 'h-10',
-      'relative', 'my-2'
+      "flex",
+      "flex-col",
+      "bg-transparent",
+      "w-full",
+      "h-10",
+      "relative",
+      "my-2"
     );
 
-    const chatNameWithoutDot = chat.chat_name.endsWith('.') ? chat.chat_name.slice(0, -1) : chat.chat_name;
+    const chatNameWithoutDot = chat.chat_name.endsWith(".")
+      ? chat.chat_name.slice(0, -1)
+      : chat.chat_name;
 
-    const chatButtonContainer = document.createElement('div');
-    chatButtonContainer.classList.add('relative');
+    const chatButtonContainer = document.createElement("div");
+    chatButtonContainer.classList.add("relative");
 
-    const accessButton = document.createElement('button');
+    const accessButton = document.createElement("button");
 
     // Create an inner container for the text
-    const textContainer = document.createElement('div');
+    const textContainer = document.createElement("div");
     textContainer.innerHTML = chatNameWithoutDot;
-    textContainer.style.maxWidth = '80%';
-    textContainer.style.overflow = 'hidden';
-    textContainer.style.whiteSpace = 'nowrap';
-    textContainer.style.textOverflow = 'hidden';
+    textContainer.style.maxWidth = "80%";
+    textContainer.style.overflow = "hidden";
+    textContainer.style.whiteSpace = "nowrap";
+    textContainer.style.textOverflow = "hidden";
 
     // Add text container to the button
     accessButton.appendChild(textContainer);
 
     // Add button styles
     accessButton.classList.add(
-      'bg-transparent', 'text-white', 'text-xs', 'font-medium', 'rounded',
-      'text-xs', 'cursor-pointer', 'text-left', 'pl-2',
-      'focus:outline-none', 'hover:bg-purple-700', 'w-full', 'h-10'
+      "bg-transparent",
+      "text-white",
+      "text-xs",
+      "font-semibold",
+      "rounded",
+      "text-md",
+      "cursor-pointer",
+      "text-left",
+      "pl-2",
+      "focus:outline-none",
+      "hover:bg-gray-700",
+      "w-full",
+      "h-8"
     );
-    accessButton.addEventListener('click', createButtonClickHandler(chat, chatContainer));
+    accessButton.addEventListener(
+      "click",
+      createButtonClickHandler(chat, chatContainer)
+    );
 
     // Create the "More Options" button
-    const moreOptionsButton = document.createElement('button');
+    const moreOptionsButton = document.createElement("button");
     moreOptionsButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>';
     moreOptionsButton.classList.add(
-      'absolute', 'top-1', 'right-1', 'text-white',
-      'rounded-full', 'px-3', 'py-2', 'text-xs', 'cursor-pointer', 'focus:outline-none', 'hover:text-gray-400'
+      "absolute",
+      "top-0",
+      "right-1",
+      "text-white",
+      "rounded-full",
+      "px-3",
+      "py-2",
+      "text-xs",
+      "cursor-pointer",
+      "focus:outline-none",
+      "hover:text-gray-400"
     );
 
     // Create the options dropdown
-    const optionsDropdown = document.createElement('div');
+    const optionsDropdown = document.createElement("div");
     optionsDropdown.classList.add(
-      'hidden', 'absolute', 'right-0', 'top-11', 'bg-gray-900',
-      'rounded-md', 'z-10', 'text-sm', 'options-dropdown' // Added a class for easier selection
+      "hidden",
+      "absolute",
+      "right-0",
+      "top-8",
+      "bg-gray-700",
+      "border",
+      "border-gray-700",
+      "rounded-md",
+      "z-10",
+      "text-sm",
+      "shadow-md",
+      "py-1",
+      "px-2",
+      "mt-2",
+      "w-48",
+      "transition",
+      "duration-100",
+      "ease-in-out",
+      "transform",
+      "origin-top",
+      "options-dropdown" // Added a class for easier selection
     );
 
     // Create the "Delete Chat" option
-    const deleteOption = document.createElement('div');
-    deleteOption.innerHTML = '<i class="fas fa-trash"></i><span class="ml-2">Delete Chat</span>';
-    deleteOption.classList.add('py-3', 'px-6', 'text-red-600', 'rounded-md', 'cursor-pointer', 'text-xs', 'hover:bg-gray-800');
-    deleteOption.addEventListener('click', function (event) {
+    const deleteOption = document.createElement("div");
+    deleteOption.innerHTML =
+      '<i class="fas fa-trash"></i><span class="ml-2">Delete Chat</span>';
+    deleteOption.classList.add(
+      "py-3",
+      "px-6",
+      "text-red-500",
+      "rounded-md",
+      "cursor-pointer",
+      "text-xs",
+      "hover:bg-gray-600"
+    );
+    deleteOption.addEventListener("click", function (event) {
       event.stopPropagation();
       removeChat(chat.chat_id, chatContainer);
     });
 
     // Create the "Rename" option
-    const renameOption = document.createElement('div');
-    renameOption.innerHTML = '<i class="fas fa-edit"></i><span class="ml-2">Rename</span>';
-    renameOption.classList.add('py-3', 'px-6', 'cursor-pointer', 'rounded-md', 'text-xs', 'hover:bg-gray-800', 'flex', 'items-center');
-    renameOption.addEventListener('click', function (event) {
+    const renameOption = document.createElement("div");
+    renameOption.innerHTML =
+      '<i class="fas fa-edit"></i><span class="ml-2">Rename</span>';
+    renameOption.classList.add(
+      "py-3",
+      "px-6",
+      "cursor-pointer",
+      "rounded-md",
+      "text-xs",
+      "hover:bg-gray-600",
+      "flex",
+      "items-center"
+    );
+    renameOption.addEventListener("click", function (event) {
       event.stopPropagation();
 
       // Create an input element
-      const inputElement = document.createElement('input');
-      inputElement.type = 'text';
+      const inputElement = document.createElement("input");
+      inputElement.type = "text";
       inputElement.value = chat.chat_name;
-      inputElement.classList.add('border', 'border-gray-300', 'p-1', 'text-black', 'rounded-sm');
+      inputElement.classList.add(
+        "border",
+        "border-gray-300",
+        "p-1",
+        "text-black",
+        "rounded-sm"
+      );
 
       // Replace the accessButton content with the input element
-      accessButton.innerHTML = '';
+      accessButton.innerHTML = "";
       accessButton.appendChild(inputElement);
 
       // Focus on the input element
       inputElement.focus();
 
       // Listen for blur event on input element
-      inputElement.addEventListener('blur', async function () {
+      inputElement.addEventListener("blur", async function () {
         const newChatName = inputElement.value.trim();
 
         try {
@@ -890,7 +1108,7 @@ content %}
             chat.chat_name = newChatName;
           }
         } catch (error) {
-          console.error('Error updating chat name:', error);
+          console.error("Error updating chat name:", error);
           // Handle the error appropriately (e.g., display an error message to the user)
         } finally {
           // Remove the input element and restore the original content
@@ -899,32 +1117,34 @@ content %}
       });
 
       // Listen for keydown event on input element
-      inputElement.addEventListener('keydown', function (event) {
+      inputElement.addEventListener("keydown", function (event) {
         // Prevent default action for spacebar key
-        if (event.key === ' ' || event.code === 'Space') {
+        if (event.key === " " || event.code === "Space") {
           event.preventDefault();
 
           // Add a space to the input
-          inputElement.value += ' ';
+          inputElement.value += " ";
         }
 
         // If Enter key is pressed, blur the input element and close the dropdown
-        if (event.key === 'Enter') {
+        if (event.key === "Enter") {
           inputElement.blur();
           closeOptionsDropdown();
         }
       });
     });
 
-    moreOptionsButton.addEventListener('click', function (event) {
+    moreOptionsButton.addEventListener("click", function (event) {
       event.stopPropagation();
       // Close all open dropdowns before opening the clicked one
-      document.querySelectorAll('.options-dropdown').forEach(function (dropdown) {
-        if (dropdown !== optionsDropdown) {
-          dropdown.classList.add('hidden');
-        }
-      });
-      optionsDropdown.classList.toggle('hidden');
+      document
+        .querySelectorAll(".options-dropdown")
+        .forEach(function (dropdown) {
+          if (dropdown !== optionsDropdown) {
+            dropdown.classList.add("hidden");
+          }
+        });
+      optionsDropdown.classList.toggle("hidden");
     });
 
     optionsDropdown.appendChild(renameOption);
@@ -938,17 +1158,17 @@ content %}
   }
 
   function displayChatList(chats) {
-    const chatListSection = document.getElementById('chatListSection');
-    chatListSection.classList.add('simplebar');
-    chatListSection.classList.add('overflow-auto');
+    const chatListSection = document.getElementById("chatListSection");
+    chatListSection.classList.add("simplebar");
+    chatListSection.classList.add("overflow-auto");
 
     const reversedChats = chats.slice().reverse();
     const chatsToDisplay = reversedChats.slice();
 
-    document.addEventListener('click', closeOptionsDropdown);
+    document.addEventListener("click", closeOptionsDropdown);
 
-    chatsToDisplay.forEach(chat => {
-      const chatContainer = document.createElement('div');
+    chatsToDisplay.forEach((chat) => {
+      const chatContainer = document.createElement("div");
       chatContainer.id = `chat_container_${chat.chat_id}`;
       prepareChatNameEntity(chat, chatContainer);
       chatListSection.appendChild(chatContainer);
@@ -956,14 +1176,16 @@ content %}
 
     // Initialize SimpleBar after adding the chat list
     const simpleBar = new SimpleBar(chatListSection, {
-      autoHide: false
+      autoHide: false,
     });
 
     function closeOptionsDropdown() {
       // Close the options dropdown when clicking outside the chat list
-      document.querySelectorAll('.options-dropdown').forEach(function (dropdown) {
-        dropdown.classList.add('hidden');
-      });
+      document
+        .querySelectorAll(".options-dropdown")
+        .forEach(function (dropdown) {
+          dropdown.classList.add("hidden");
+        });
     }
   }
 
@@ -976,28 +1198,50 @@ content %}
 
   // Function to update chat name
   function updateChatName(chatId, newChatName) {
-    fetch("{{ params['backend_base_path'] }}" + 'update_chatname', {
-      method: 'POST',
+    fetch("{{ params['backend_base_path'] }}" + "update_chatname", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         chat_id: chatId,
         new_chat_name: newChatName,
       }),
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         // Handle the response from the server, e.g., show success message or handle errors
         console.log(data);
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
       });
   }
 
   // Call the function after defining it
   get_chat_list();
+
+
+
+  function get_user_details() {
+    fetch("{{ params['backend_base_path'] }}" + "get_user_details", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Handle the response from the server, e.g., show success message or handle errors
+        console.log(data);
+        document.getElementById("username").innerHTML = data.username
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  get_user_details()
 
 </script>
 

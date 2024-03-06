@@ -8,18 +8,25 @@ from typing import List
 import openai
 import os
 import tiktoken
+import google.generativeai as genai
 
+google_api_key = os.environ['GOOGLE_API_KEY']
 openai.api_key = os.environ.get("OPENAI_API")
+genai.configure(api_key=google_api_key)
 
-# Modules
 
+# def getResponseFromMessages(messages):
+
+#     chat_completion = openai.ChatCompletion.create(
+#         model="gpt-3.5-turbo", messages=messages)
+#     bot_response = chat_completion.choices[0].message.content
+#     return bot_response
 
 def getResponseFromMessages(messages):
-
-    chat_completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo", messages=messages)
-#     print(chat_completion)
-    bot_response = chat_completion.choices[0].message.content
+    model = genai.GenerativeModel('gemini-pro')
+    conv_history = [{'parts': [interaction['content']], 'role': interaction['role']
+                     if interaction['role'] != 'assistant' else 'model'} for interaction in messages]
+    bot_response = model.generate_content(conv_history).text
     return bot_response
 
 
@@ -48,6 +55,21 @@ def runSelectQuery(query):
             if connection:
                 with connection.cursor() as cursor:
                     cursor.execute(query)
+                    results = cursor.fetchall()
+            else:
+                raise Exception("Failed to connect to MySQL")
+    except Exception as e:
+        print(f'Some error occurred: {e}')
+    return results
+
+
+def runSelectQuery_with_values(query, values):
+    results = None
+    try:
+        with getSQLConnection() as connection:
+            if connection:
+                with connection.cursor() as cursor:
+                    cursor.execute(query, values)
                     results = cursor.fetchall()
             else:
                 raise Exception("Failed to connect to MySQL")

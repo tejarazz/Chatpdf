@@ -1,3 +1,4 @@
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,13 +6,32 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/12122/12122368.png" type="image/png">
   <title>Login and Signup Page</title>
-</head>
 
-<body class="bg-purple-100 font-sans flex items-center justify-center h-screen">
-  <div class="w-1/4">
+</head>
+<style>
+  .login-nav {
+    background-color: rgb(95, 85, 238);
+  }
+
+  .main-color {
+    background-color: #171717;
+  }
+</style>
+
+<body class="main-color font-sans flex flex-col items-center justify-start h-screen">
+  <nav class="login-nav py-5 w-full shadow-lg text-white flex justify-center">
+    <div class="flex items-center justify-center w-full">
+      <div class="pl-6">
+        <a class="md:text-md font-sans text-2xl w-full text-white font-bold" href="/">TextMateAI</a>
+        <i class="fas fa-comment ml-1 text-white text-xl"></i>
+      </div>
+    </div>
+  </nav>
+  <div class="w-full md:w-4/5 lg:w-2/5 xl:w-1/3">
     <!-- Login Form -->
-    <div id="loginContainer" class="bg-white p-8 rounded-md shadow-md max-w-full">
+    <div id="loginContainer" class="bg-white p-8 mt-20 rounded-md shadow-lg max-w-full form-container">
       <h2 class="text-3xl font-semibold mb-4 text-center text-gray-800">Login</h2>
       <form id="loginForm" class="space-y-4">
         <div>
@@ -27,6 +47,7 @@
         <button type="submit"
           class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300">Login</button>
       </form>
+      <div id="loginMessage" class="mt-4 text-center"></div>
       <div class="mt-4 text-center">
         <p class="text-gray-600">Don't have an account? </p>
         <a href="#" class="text-blue-500 hover:underline" onclick="toggleForm('signupContainer')">Signup here</a>
@@ -34,11 +55,11 @@
     </div>
 
     <!-- Signup Form -->
-    <div id="signupContainer" class="hidden bg-white p-8 rounded-md shadow-md max-w-full">
+    <div id="signupContainer" class="hidden bg-white mt-16 p-8 rounded-md shadow-lg max-w-full form-container">
       <h2 class="text-3xl font-semibold mb-4 text-center text-gray-800">Signup</h2>
       <form id="signupForm" class="space-y-4">
         <div>
-          <label for="fullname" class="block text-sm font-medium text-gray-600">Full Name</label>
+          <label for="fullname" class="block text-sm font-medium text-gray-600">Username</label>
           <input type="text" id="fullname" name="fullname"
             class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
         </div>
@@ -48,46 +69,163 @@
             class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
         </div>
         <div>
-          <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
-          <input type="password" id="password" name="password"
+          <label for="signup_password" class="block text-sm font-medium text-gray-600">Password</label>
+          <input type="password" id="signup_password" name="password"
+            class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
+        </div>
+        <div>
+          <label for="confirm_password" class="block text-sm font-medium text-gray-600">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password"
             class="mt-1 p-2 w-full border rounded-md focus:outline-none focus:border-green-500" required>
         </div>
         <button type="submit"
           class="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:border-green-300">Signup</button>
       </form>
+      <div id="signupMessage" class="mt-4 text-center"></div>
       <div class="mt-4 text-center">
         <p class="text-gray-600">Already have an account? </p>
         <a href="#" class="text-blue-500 hover:underline" onclick="toggleForm('loginContainer')">Login here</a>
       </div>
     </div>
-  </div>
+    <script>
 
-  <script>
-    function toggleForm(activeFormId) {
-      const loginContainer = document.getElementById('loginContainer');
-      const signupContainer = document.getElementById('signupContainer');
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("loginForm").addEventListener("submit", function (event) {
+          event.preventDefault();
+          var username = document.getElementById("username").value;
+          var password = document.getElementById("password").value;
+          var loginMessage = document.getElementById("loginMessage");
 
-      if (activeFormId === 'loginContainer') {
-        loginContainer.classList.remove('hidden');
-        signupContainer.classList.add('hidden');
-      } else {
-        loginContainer.classList.add('hidden');
-        signupContainer.classList.remove('hidden');
+          // Send POST request to Flask backend
+          fetch("{{ params['backend_base_path'] }}" + 'login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password)
+          })
+            .then(response => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error('Login failed');
+              }
+            })
+            .then(data => {
+              // Handle successful login
+              loginMessage.textContent = "";
+              window.location.href = `/`;
+
+
+            })
+            .catch(error => {
+              // Handle login error
+              loginMessage.textContent = error.message;
+            });
+        });
+      });
+
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("signupForm").addEventListener("submit", function (event) {
+          event.preventDefault();
+          var signupUsername = document.getElementById("fullname").value.trim();
+          var signupPassword = document.getElementById("signup_password").value.trim();
+          var confirmPassword = document.getElementById("confirm_password").value.trim();
+          var email = document.getElementById("email").value.trim();
+          var signupMessage = document.getElementById("signupMessage");
+
+          // Validate username format and length
+          if (!signupUsername || !/^[a-zA-Z0-9]+$/.test(signupUsername) || signupUsername.length < 6 || signupUsername.length > 20) {
+            signupMessage.textContent = "Username must contain only alphanumeric characters (a-z, A-Z, 0-9) and be between 6 to 20 characters.";
+            return;
+          }
+
+          // Validate password length
+          if (!signupPassword || signupPassword.length < 8 || signupPassword.length > 20) {
+            signupMessage.textContent = "Password must be between 8 to 20 characters.";
+            return;
+          }
+
+          // Validate email format
+          var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailPattern.test(email)) {
+            signupMessage.textContent = "Please enter a valid email address.";
+            return;
+          }
+
+          // Validate password and confirm password match
+          if (signupPassword !== confirmPassword) {
+            signupMessage.textContent = "Passwords do not match.";
+            return;
+          }
+
+          // Send POST request to backend (replace URL with actual endpoint)
+          fetch("{{ params['backend_base_path'] }}" + 'sign_up', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'username=' + encodeURIComponent(signupUsername) + '&password=' + encodeURIComponent(signupPassword) + '&email=' + encodeURIComponent(email)
+          })
+            .then(response => {
+              if (response.ok) {
+                return response.json().then(data => {
+                  // Handle successful signup
+                  signupMessage.textContent = data.message;
+                  window.location.href = `/`;
+                });
+              } else {
+                return response.json().then(errorData => {
+                  // Handle signup error
+                  throw new Error(errorData.message);
+                });
+              }
+            })
+            .then(data => {
+              // Handle successful signup
+            })
+            .catch(error => {
+              // Handle signup error
+              signupMessage.textContent = error.message;
+            });
+        });
+      });
+
+      function toggleForm(activeFormId) {
+        const loginContainer = document.getElementById('loginContainer');
+        const signupContainer = document.getElementById('signupContainer');
+
+        const scaleDown = (element) => {
+          element.style.transform = 'scale(0)';
+          element.style.transition = 'transform 1s ease-in-out';
+        };
+
+        const scaleUp = (element) => {
+          element.style.transform = 'scale(1)';
+          element.style.transition = 'transform 1s ease-in-out';
+        };
+
+        if (activeFormId === 'loginContainer') {
+          scaleDown(signupContainer);
+          setTimeout(() => {
+            signupContainer.classList.add('hidden');
+            scaleUp(loginContainer);
+            loginContainer.classList.remove('hidden');
+          }, 200);
+        } else {
+          scaleDown(loginContainer);
+          setTimeout(() => {
+            loginContainer.classList.add('hidden');
+            scaleUp(signupContainer);
+            signupContainer.classList.remove('hidden');
+          }, 200);
+        }
       }
-    }
 
-    document.getElementById("loginForm").addEventListener("submit", function (event) {
-      event.preventDefault();
-      // Login form submission logic here
-      alert("login success")
-    });
 
-    document.getElementById("signupForm").addEventListener("submit", function (event) {
-      event.preventDefault();
-      alert("signed up")
-      // Signup form submission logic here
-    });
-  </script>
+    </script>
 </body>
 
 </html>
+{% endblock %}

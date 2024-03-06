@@ -1,18 +1,79 @@
 import os
 from flask import Flask, request, jsonify
-from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data
+from modules.fileprocess import fileprocess, save_conversation, store_chat_info, load_chat_data, rem_doc
 from modules.fileprocess import load_chat_list, del_chat, update_chatname, get_embeddings_of_doc
-from modules.fileprocess import get_similar_chunks,  load_file_list
+from modules.fileprocess import get_similar_chunks,  load_file_list, loginform, signup_form, get_user_info
 from config import Config
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import tiktoken
 from utilities import getResponseFromMessages, get_token_count, select_messages_within_token_limit
 import json
+from flask import request, session, make_response
+import uuid
+
+
+def login():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    login_status, user_id = loginform(username, password)
+    if login_status:
+        response = make_response(
+            jsonify({"message": "login successful", "username": username}))
+        session['sid'] = str(uuid.uuid4())
+        session['userid'] = user_id
+        # Set the cookie
+        response.set_cookie('sid', str(session['sid']))
+        return response, 200
+    else:
+        response = make_response(jsonify({"message": "login failed"}))
+        return response, 401
+
+
+def logout():
+    # Create a response
+    response = make_response(jsonify({"message": "Logged out successfully"}))
+
+    # Delete all cookies
+    cookies_to_delete = request.cookies.keys()
+    for cookie_name in cookies_to_delete:
+        response.delete_cookie(cookie_name)
+
+    return response, 200
+
+
+def sign_up():
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password_hash = request.form.get('password')
+
+    user_creation_status, message = signup_form(username, email, password_hash)
+    if user_creation_status:
+        return jsonify({"message": "User created"}), 200
+    else:
+        return jsonify({"message": message}), 409
+
+
+def get_user_details():
+    b_sid = request.cookies.get('sid', None)
+    s_sid = session.get('sid', None)
+    user_id = session['userid']
+    if not (b_sid and b_sid == s_sid):
+        return jsonify({"error": 'Authorization Error'}), 401
+    username = get_user_info(user_id)
+    if username:
+        return jsonify({"message": "User details found", "username": username, "user_id": user_id}), 200
+    else:
+        return jsonify({"message": "User details not found"}), 404
 
 
 def file_upload():
     try:
+        b_sid = request.cookies.get('sid', None)
+        s_sid = session.get('sid', None)
+        user_id = session['userid']
+        if not (b_sid and b_sid == s_sid):
+            return jsonify({"error": 'Authorization Error'}), 401
         UPLOAD_FOLDER = Config.UPLOAD_FOLDER
         # Check if the POST request has a file part
         if 'file' not in request.files:
@@ -32,7 +93,7 @@ def file_upload():
             UPLOAD_FOLDER, f"{secure_filename(file.filename)}")
         file.save(file_path)
 
-        fileprocess(file_path, 1)
+        fileprocess(file_path, user_id)
         if os.path.exists(file_path) and file_path.endswith('.pdf'):
             os.remove(file_path)
 
@@ -44,32 +105,32 @@ def file_upload():
 
 def list_files():
     try:
+        b_sid = request.cookies.get('sid', None)
+        s_sid = session.get('sid', None)
+        user_id = session['userid']
+        if not (b_sid and b_sid == s_sid):
+            return jsonify({"error": 'Authorization Error'}), 401
         UPLOAD_FOLDER = Config.UPLOAD_FOLDER
-        status, content = load_file_list()
+        status, content = load_file_list(user_id)
         if status:
-            file_list = []
-            files = content
-            for file in files:
-                file_info = {
-                    'file_name': file['file_name']
-                }
-                file_list.append(file_info)
-
-            return jsonify({"files": file_list}), 200
+            return jsonify({"files": content}), 200
         else:
-            raise Exception(content)
+            return jsonify({"files": []}), 200
     except Exception as e:
+        print(e)
         return jsonify({"error": str(e)}), 500
 
 
 def list_all_chats():
-    # Implement logic to list all chats
-
     try:
         # Get the chat_id parameter from the query string
         # chat_id = request.args.get('chat_id')
-
-        success, chat_data = load_chat_list()
+        b_sid = request.cookies.get('sid', None)
+        s_sid = session.get('sid', None)
+        user_id = session['userid']
+        if not (b_sid and b_sid == s_sid):
+            return jsonify({"error": 'Authorization Error'}), 401
+        success, chat_data = load_chat_list(user_id)
 
         # Check if chat_data retrieval was successful
         if success:
@@ -89,8 +150,11 @@ def create_chat():
         data = request.get_json()
         file_names = data['fileNames']
 
-        # Assuming user_id is available, replace with the actual user_id
-        user_id = 1  # Replace with the actual user_id
+        b_sid = request.cookies.get('sid', None)
+        s_sid = session.get('sid', None)
+        user_id = session['userid']
+        if not (b_sid and b_sid == s_sid):
+            return jsonify({"error": 'Authorization Error'}), 401
 
         # Store chat information and retrieve the chat_id
         stored_chat_id = store_chat_info(file_names, user_id)
@@ -105,20 +169,25 @@ def create_chat():
         return jsonify({'error': f'{str(e)}. Files: {", ".join(file_names)}', 'chat_id': None}), 400
 
 
-def add_document(chat_id):
-
-    return jsonify({"message": "Document added succesfully"})
-
-
 def remove_document(chat_id):
-    # Implement logic to remove a document from a chat
-    return jsonify({"message": "Document removed from chat"})
+    try:
+        pass
+    except Exception as e:
+        # Handle other potential errors and return an error message
+        print("An exception occurred:", e)
+        return jsonify({"error": str(e)}), 500
 
 
 def delete_chat(chat_id):
     try:
+
+        b_sid = request.cookies.get('sid', None)
+        s_sid = session.get('sid', None)
+        user_id = session['userid']
+        if not (b_sid and b_sid == s_sid):
+            return jsonify({"error": 'Authorization Error'}), 401
         # Call the del_chat function to delete the chat
-        success, result = del_chat(chat_id)
+        success, result = del_chat(chat_id, user_id)
 
         if success:
             return jsonify(result)
@@ -136,7 +205,12 @@ def load_chat(chat_id):
         # Get the chat_id parameter from the query string
         # chat_id = request.args.get('chat_id')
 
-        success, chat_data = load_chat_data(chat_id)
+        b_sid = request.cookies.get('sid', None)
+        s_sid = session.get('sid', None)
+        user_id = session['userid']
+        if not (b_sid and b_sid == s_sid):
+            return jsonify({"error": 'Authorization Error'}), 401
+        success, chat_data = load_chat_data(chat_id, user_id)
 
         # Check if chat_data retrieval was successful
         if success:
@@ -157,9 +231,14 @@ def update_chat_name():
         data = request.get_json()
         chat_id = data.get('chat_id')
         new_chat_name = data.get('new_chat_name')
+        b_sid = request.cookies.get('sid', None)
+        s_sid = session.get('sid', None)
+        user_id = session['userid']
+        if not (b_sid and b_sid == s_sid):
+            return jsonify({"error": 'Authorization Error'}), 401
 
         # Call the function to update the chat name
-        success, result = update_chatname(chat_id, new_chat_name)
+        success, result = update_chatname(chat_id, new_chat_name, user_id)
 
         if success:
             return jsonify(result)
@@ -173,12 +252,18 @@ def update_chat_name():
 
 def ask_question(chat_id):
     try:
+
+        b_sid = request.cookies.get('sid', None)
+        s_sid = session.get('sid', None)
+        user_id = session['userid']
+        if not (b_sid and b_sid == s_sid):
+            return jsonify({"error": 'Authorization Error'}), 401
+
         question_text = request.form.get('question')
         if not question_text:
             return jsonify({"error": "Question parameter is missing"}), 400
 
-        user_id = 1
-        status, data = load_chat_data(chat_id)
+        status, data = load_chat_data(chat_id, user_id)
         # Extract document name from the chat(data)
 
         doc_names = data["documents"]
@@ -271,7 +356,7 @@ A compilation of Greek, Roman, and Norse mythology, providing a comprehensive ov
 
             messages_dum.append(q)
             chat_name = getResponseFromMessages(messages_dum)
-        save_conversation(messages, chat_id, chat_name)
+        save_conversation(messages, chat_id, user_id, chat_name)
         return jsonify({"conversation": part_conv, "chat_name": chat_name})
 
     except Exception as e:

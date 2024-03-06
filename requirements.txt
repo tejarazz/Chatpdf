@@ -1,0 +1,15 @@
+Flask==2.2.5
+Flask-Cors==3.0.10
+Flask-MySQLdb==2.0.0
+Flask-Session==0.6.0
+google-generativeai==0.3.2
+langchain==0.1.6
+mysql-connector-python==8.3.0
+numpy==1.26.3
+openai==0.27.0
+pandas==2.1.4
+PyMuPDF==1.23.22
+scikit-learn==1.4.0
+scipy==1.12.0
+sentence-transformers==2.3.1
+tiktoken==0.6.0
