@@ -123,14 +123,14 @@ SET conversation = %s{chat_query} WHERE chat_id = %s and user_id = %s
 
 
 def store_chat_info(documents, user_id):
+    chat_id = 1
     try:
         select_query = f'select max(chat_id) from PDFCHAT.Chat_info'
         result = runSelectQuery(select_query)
         last_chat_id = result[0][0]
+
         if last_chat_id:
             chat_id = last_chat_id+1
-        else:
-            chat_id = 0
         # Insert chat information without fetching results
         insert_query = '''
             INSERT INTO PDFCHAT.Chat_info (chat_id, chat_name, user_id, documents, conversation)
@@ -143,7 +143,7 @@ def store_chat_info(documents, user_id):
 
     except Exception as e:
         print(f'Error in store_chat_info: {e}')
-        return 1
+        return chat_id
 
 
 def load_chat_data(chat_id, user_id):

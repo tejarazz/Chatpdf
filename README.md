@@ -2,9 +2,9 @@
 - docker build -t  backend -f Dockerfile.backend .
 - docker build -t  frontend -f Dockerfile.frontend .
 
-- docker run -it --net=host -e GOOGLE_API_KEY='<KEY>' --name=test backend
-- docker run -it --net=host --name=web frontend
-- docker run -it --net=host -e MYSQL_USER='<dev user name>' -e MYSQL_PASSWORD='<pwd>' -e MYSQL_DATABASE='PDFCHAT' -e MYSQL_ROOT_PASSWORD='<pwd_root>' mysql
+- docker run -it --net=host --env-file ~/WORKSPACE/setup/backend_config.dat --name=chatpdf_backend backend
+- docker run -it --net=host --env-file ~/WORKSPACE/setup/frontend_config.dat --name=chatpdf_frontend frontend
+- docker run -it --net=host --env-file ~/WORKSPACE/setup/db_config.dat --name=chatpdf_db mysql
 
 - sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /home/vinay/WORKSPACE/setup/chatpdf.key -out /home/vinay/WORKSPACE/setup/chatpdf.crt
 - docker run --name nginx_server --net=host \
